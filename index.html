@@ -1368,7 +1368,7 @@
         function getUsers() {
             const stored = localStorage.getItem('icsUsers');
             if (stored) return JSON.parse(stored);
-            const defaults = [{ username: 'admin', password: 'ics', role: 'admin' }];
+            const defaults = [{ username: 'admin', password: 'ics2000', role: 'admin' }];
             localStorage.setItem('icsUsers', JSON.stringify(defaults));
             return defaults;
         }
