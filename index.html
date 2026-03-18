@@ -939,6 +939,62 @@
         .enq-cold { background: #e0f0ff; color: #1a3a7a; border: 1px solid #a8c8f5; }
         .enq-converted { background: #e0f5e9; color: #1a5e30; border: 1px solid #a8d5b5; }
 
+        /* ══════════════════════════════════════
+           CENTER / BATCH MANAGEMENT
+        ══════════════════════════════════════ */
+        .batch-student-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 13px;
+            border-bottom: 1px solid #ede6db;
+            cursor: pointer;
+            transition: background 0.15s;
+            user-select: none;
+        }
+        .batch-student-item:last-child { border-bottom: none; }
+        .batch-student-item:hover { background: rgba(30,77,94,0.06); }
+        .batch-student-item.selected { background: rgba(30,77,94,0.1); }
+        .batch-student-item input[type="checkbox"] {
+            width: 16px; height: 16px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .batch-slot-card {
+            background: rgba(30,77,94,0.05);
+            border: 1px solid rgba(30,77,94,0.12);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        .batch-slot-header {
+            background: linear-gradient(135deg, #1a3a4a, #1e4d5e);
+            color: white;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            font-weight: 700;
+        }
+        .batch-slot-body {
+            padding: 10px 14px;
+        }
+        .batch-student-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(30,77,94,0.08);
+            border: 1px solid rgba(30,77,94,0.15);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin: 3px;
+        }
+
         /* Header right area for logout */
         .header-actions {
             position: absolute;
@@ -998,11 +1054,11 @@
             <button class="tab-btn active" onclick="switchTab('dashboard')" id="tab-dashboard">
                 📊 Dashboard
             </button>
-            <button class="tab-btn" onclick="switchTab('receipt')" id="tab-receipt">
-                🧾 Payment Receipt
-            </button>
             <button class="tab-btn" onclick="switchTab('enquiry')" id="tab-enquiry">
                 📋 Student Enquiry
+            </button>
+            <button class="tab-btn" onclick="switchTab('center')" id="tab-center">
+                🏫 Center
             </button>
             <button class="tab-btn" onclick="switchTab('expenses')" id="tab-expenses">
                 💸 Center Expenses
@@ -1119,12 +1175,6 @@
                     <button class="btn" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; border-bottom: 3px solid #a78bfa; box-shadow: 0 4px 15px rgba(124,58,237,0.3);" onclick="exportToTally()">
                         📥 Export to Tally (XML)
                     </button>
-                    <button class="btn btn-danger" onclick="clearAllData()">
-                        🗑️ Clear All Data
-                    </button>
-                    <button class="btn" style="background: linear-gradient(135deg, #6b1a1a 0%, #a02020 100%); color: white; border-bottom: 3px solid #e05555; box-shadow: 0 4px 15px rgba(160,32,32,0.35);" onclick="clearAndResetStorage()">
-                        🔄 Clear &amp; Reset Storage
-                    </button>
                     <button class="btn" style="background: linear-gradient(135deg, #1a3a4a 0%, #1e4d5e 100%); color: white; border-bottom: 3px solid #c8732a;" onclick="openGenerateReportModal()">
                         📋 Generate Report
                     </button>
@@ -1179,46 +1229,7 @@
         </div><!-- end tab-dashboard -->
 
         <!-- ═══════════════════════════════════════════
-             TAB 2: PAYMENT RECEIPT
-        ═══════════════════════════════════════════ -->
-        <div class="tab-content" id="tabContent-receipt">
-        <div class="panel">
-            <div class="panel-header">
-                <h2>🧾 Payment Receipt</h2>
-            </div>
-            <div class="info-box">📌 Student शोधा आणि त्याची Receipt बघा / Download करा</div>
-
-            <div class="search-box" style="margin-bottom:18px;">
-                <input type="text" id="receiptSearchInput" placeholder="🔍 Name / Mobile / Receipt No. टाका...">
-                <button class="btn btn-primary" onclick="searchForReceipt()">🔍 Search</button>
-                <button class="btn btn-info" onclick="showAllForReceipt()">Show All</button>
-            </div>
-
-            <div class="table-wrapper" style="padding:0; background:transparent; box-shadow:none; border:none;">
-            <table class="students-table">
-                <thead>
-                    <tr>
-                        <th>Receipt No.</th>
-                        <th>Student Name</th>
-                        <th>Mobile</th>
-                        <th>Course</th>
-                        <th>Total Fees</th>
-                        <th>Paid Fees</th>
-                        <th>Balance</th>
-                        <th>Status</th>
-                        <th>Receipt</th>
-                    </tr>
-                </thead>
-                <tbody id="receiptTableBody">
-                    <tr><td colspan="9" class="empty-state"><div style="font-size:2.5em;">🧾</div><p>Search करून student निवडा</p></td></tr>
-                </tbody>
-            </table>
-            </div>
-        </div>
-        </div><!-- end tab-receipt -->
-
-        <!-- ═══════════════════════════════════════════
-             TAB 3: STUDENT ENQUIRY
+             TAB 2: STUDENT ENQUIRY
         ═══════════════════════════════════════════ -->
         <div class="tab-content" id="tabContent-enquiry">
         <div class="main-grid">
@@ -1456,8 +1467,34 @@
                 <button class="btn btn-primary" onclick="openCourseManager()">⚙️ Open Course Manager</button>
             </div>
 
-            <!-- Data Management (Admin only) -->
-            <div class="panel admin-only-setting">
+            <!-- Account Info — सर्व users ना दिसेल -->
+            <div class="panel" id="userAccountInfoPanel">
+                <div class="panel-header"><h2>📋 Account Information</h2></div>
+                <div style="display:grid; gap:10px;">
+                    <div style="background:white; border-radius:8px; padding:12px 16px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:var(--text-mid); font-weight:600;">👤 Username:</span>
+                        <span id="userInfoUsername" style="font-weight:700; color:var(--text-dark);">—</span>
+                    </div>
+                    <div style="background:white; border-radius:8px; padding:12px 16px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:var(--text-mid); font-weight:600;">🛡️ Role:</span>
+                        <span id="userInfoRole" style="font-weight:700; color:var(--text-dark);">—</span>
+                    </div>
+                    <div style="background:white; border-radius:8px; padding:12px 16px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:var(--text-mid); font-weight:600;">📅 Software Expiry Date:</span>
+                        <span id="userInfoExpiry" style="font-weight:700;">—</span>
+                    </div>
+                    <div style="background:white; border-radius:8px; padding:12px 16px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:var(--text-mid); font-weight:600;">⏳ Days Remaining:</span>
+                        <span id="userInfoDays" style="font-weight:700;">—</span>
+                    </div>
+                </div>
+                <div style="margin-top:12px; font-size:0.82em; color:var(--text-light); text-align:center;">
+                    📞 Renew साठी संपर्क करा: <strong>ICS Computers — 9822053668</strong>
+                </div>
+            </div>
+
+            <!-- Data Management (सर्वांना दिसेल, Clear buttons फक्त Admin ला) -->
+            <div class="panel">
                 <div class="panel-header"><h2>🗄️ Data Management</h2></div>
                 <div style="display:grid; gap:12px;">
                     <button class="btn" style="background:linear-gradient(135deg,#2d5016,#4a7c22); color:white; border-bottom:3px solid #8bc34a;" onclick="backupData()">💾 Backup Data (JSON)</button>
@@ -1489,6 +1526,121 @@
 
         </div>
         </div><!-- end tab-settings -->
+
+        <!-- ═══════════════════════════════════════════
+             TAB 6: CENTER — BATCH MANAGEMENT
+        ═══════════════════════════════════════════ -->
+        <div class="tab-content" id="tabContent-center">
+
+          <!-- Stats -->
+          <div class="stats-grid" style="grid-template-columns:repeat(4,1fr); margin-bottom:18px;">
+            <div class="stat-card" style="cursor:default;">
+              <div class="stat-label">Active Batches</div>
+              <div class="stat-value" id="batchStatTotal">0</div>
+            </div>
+            <div class="stat-card green" style="cursor:default;">
+              <div class="stat-label">Total Students</div>
+              <div class="stat-value" id="batchStatStudents">0</div>
+            </div>
+            <div class="stat-card yellow" style="cursor:default;">
+              <div class="stat-label">Assigned</div>
+              <div class="stat-value" id="batchStatAssigned">0</div>
+            </div>
+            <div class="stat-card red" style="cursor:default;">
+              <div class="stat-label">Unassigned</div>
+              <div class="stat-value" id="batchStatUnassigned">0</div>
+            </div>
+          </div>
+
+          <div class="main-grid">
+
+            <!-- LEFT: Batch Dropdown + Unassigned Students -->
+            <div class="panel">
+              <div class="panel-header">
+                <h2>🕐 Batch Assign करा</h2>
+              </div>
+              <div class="info-box">📌 Batch निवडा → खालील unassigned students select करून add करा</div>
+
+              <!-- Batch Dropdown -->
+              <div class="form-group">
+                <label>Batch / Time Slot निवडा <span class="required">*</span></label>
+                <select id="batchSelect" onchange="onBatchSelect()"
+                  style="width:100%; padding:12px 14px; border:2px solid var(--border); border-radius:8px; font-size:1em; background:#fdfaf6; color:var(--text-dark); font-family:'DM Sans',sans-serif;">
+                  <option value="">-- Batch निवडा --</option>
+                  <option value="7-8 AM">🌅 7:00 AM – 8:00 AM</option>
+                  <option value="8-9 AM">🌄 8:00 AM – 9:00 AM</option>
+                  <option value="9-10 AM">☀️ 9:00 AM – 10:00 AM</option>
+                  <option value="10-11 AM">🌤️ 10:00 AM – 11:00 AM</option>
+                  <option value="11-12 PM">🌞 11:00 AM – 12:00 PM</option>
+                  <option value="12-1 PM">🕛 12:00 PM – 1:00 PM</option>
+                  <option value="1-2 PM">🌻 1:00 PM – 2:00 PM</option>
+                  <option value="2-3 PM">☁️ 2:00 PM – 3:00 PM</option>
+                  <option value="3-4 PM">🌥️ 3:00 PM – 4:00 PM</option>
+                  <option value="4-5 PM">🌇 4:00 PM – 5:00 PM</option>
+                  <option value="5-6 PM">🌆 5:00 PM – 6:00 PM</option>
+                  <option value="6-7 PM">🌃 6:00 PM – 7:00 PM</option>
+                  <option value="7-8 PM">🌙 7:00 PM – 8:00 PM</option>
+                </select>
+              </div>
+
+              <!-- Info box -->
+              <div id="batchInfoBox" style="display:none; background:rgba(30,77,94,0.07); border-left:4px solid var(--primary); padding:10px 14px; border-radius:8px; margin-bottom:12px; font-size:0.88em;"></div>
+
+              <!-- Unassigned student list section -->
+              <div id="batchStudentSelectWrap" style="display:none;">
+                <div class="form-group">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <label style="margin-bottom:0;">Unassigned Students <span id="unassignedCountBadge" style="background:var(--accent);color:white;padding:1px 8px;border-radius:10px;font-size:0.75em;font-weight:700;margin-left:6px;">0</span></label>
+                    <span>
+                      <button onclick="batchSelectAll()" style="background:none;border:none;cursor:pointer;color:var(--primary);font-weight:700;font-size:0.82em;">✅ All</button>
+                      &nbsp;|&nbsp;
+                      <button onclick="batchClearAll()" style="background:none;border:none;cursor:pointer;color:var(--danger);font-weight:700;font-size:0.82em;">❌ None</button>
+                    </span>
+                  </div>
+                  <!-- Search -->
+                  <input type="text" id="batchStudentSearch" placeholder="🔍 नाव / Course / Mobile..."
+                    oninput="filterBatchStudentList()"
+                    style="width:100%; padding:8px 12px; border:1.5px solid var(--border); border-radius:7px; font-size:0.88em; background:#fdfaf6; color:var(--text-dark); font-family:'DM Sans',sans-serif; margin-bottom:6px;">
+                  <!-- List -->
+                  <div id="batchStudentList"
+                    style="border:2px solid var(--border); border-radius:8px; max-height:280px; overflow-y:auto; background:#fdfaf6;">
+                  </div>
+                  <div style="margin-top:5px; font-size:0.78em; color:var(--text-light);">
+                    <span id="batchSelectedCount" style="font-weight:600; color:var(--primary);">0 selected</span>
+                    &nbsp;— checkbox tick करा आणि खालील button दाबा
+                  </div>
+                </div>
+                <button class="btn btn-primary" onclick="assignSelectedToBatch()" style="width:100%;">
+                  ➕ Selected Students या Batch मध्ये Add करा
+                </button>
+              </div>
+
+              <!-- Prompt when no batch selected -->
+              <div id="batchSelectPrompt" style="text-align:center; padding:30px 10px; color:var(--text-light);">
+                <div style="font-size:2.5em; margin-bottom:8px;">🕐</div>
+                <p style="font-size:0.88em;">वरून batch निवडा<br>मग unassigned students दिसतील</p>
+              </div>
+            </div>
+
+            <!-- RIGHT: Assigned Students + Batch Summary -->
+            <div class="panel">
+              <div class="panel-header">
+                <h2>📋 Batch Summary</h2>
+                <button onclick="exportBatchExcel()"
+                  style="padding:6px 13px; background:linear-gradient(135deg,#1b5e20,#2d8a3e); color:white; border:1.5px solid #81c784; border-radius:7px; cursor:pointer; font-size:0.82em; font-weight:700; white-space:nowrap;">
+                  📊 Excel Export
+                </button>
+              </div>
+              <div id="batchSummaryContainer">
+                <div class="empty-state">
+                  <div style="font-size:2.5em;">🏫</div>
+                  <p>कोणत्याही batch मध्ये students नाहीत.<br>डाव्या बाजूने batch निवडून students add करा.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div><!-- end tab-center -->
 
         </div><!-- end #appContent -->
 
@@ -1637,6 +1789,9 @@
         <button class="login-btn" onclick="doLogin()">🔓 Login to System</button>
 
         <div class="login-attempts" id="loginAttempts"></div>
+
+
+
         <div class="login-footer">
             Fees Management System · v3.0
         </div>
@@ -1830,25 +1985,59 @@
         const SUPER_PASSWORD = 'ICS@9822';
 
         // ── Multi-User System ──
-        // Force admin password to latest value on every load
+        // Default admin password — first run साठी
         (function forceAdminPassword() {
             const ADMIN_PASSWORD = 'Ics@12671';
             const stored = localStorage.getItem('icsUsers');
-            if (stored) {
-                const users = JSON.parse(stored);
-                const admin = users.find(u => u.role === 'admin' || u.username === 'admin');
-                if (admin && admin.password !== ADMIN_PASSWORD) {
-                    admin.password = ADMIN_PASSWORD;
-                    localStorage.setItem('icsUsers', JSON.stringify(users));
-                }
+            if (!stored) {
+                // पहिल्यांदा run होत असेल तर default set करा
+                localStorage.setItem('icsLoginPwd', ADMIN_PASSWORD);
             }
-            localStorage.setItem('icsLoginPwd', ADMIN_PASSWORD);
         })();
+
+        // ── Demo User Helpers ──
+        function getDemoExpiry() {
+            let stored = localStorage.getItem('icsDemoExpiry');
+            if (!stored) {
+                const d = new Date();
+                d.setMonth(d.getMonth() + 1);
+                stored = d.toISOString().split('T')[0];
+                localStorage.setItem('icsDemoExpiry', stored);
+            }
+            return stored;
+        }
+
+        function isDemoExpired() {
+            const exp = new Date(getDemoExpiry());
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            exp.setHours(0,0,0,0);
+            return exp < today;
+        }
+
+        function getDemoDaysRemaining() {
+            const exp = new Date(getDemoExpiry());
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            exp.setHours(0,0,0,0);
+            return Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+        }
 
         function getUsers() {
             const stored = localStorage.getItem('icsUsers');
-            if (stored) return JSON.parse(stored);
-            const defaults = [{ username: 'admin', password: 'Ics@12671', role: 'admin' }];
+            if (stored) {
+                let users = JSON.parse(stored);
+                // demo1 user नेहमी असावा
+                if (!users.find(u => u.username === 'demo1')) {
+                    users.push({ username: 'demo1', password: '1234', role: 'user', isDemo: true, demoExpiry: getDemoExpiry() });
+                    localStorage.setItem('icsUsers', JSON.stringify(users));
+                }
+                return users;
+            }
+            const defaults = [
+                { username: 'admin',  password: 'Ics@12671', role: 'admin' },
+                { username: 'demo1',  password: '1234',     role: 'user', isDemo: true, demoExpiry: getDemoExpiry() }
+            ];
             localStorage.setItem('icsUsers', JSON.stringify(defaults));
             return defaults;
         }
@@ -1918,6 +2107,18 @@
             const matchedUser = users.find(u => u.username === username && u.password === pwd);
 
             if (matchedUser) {
+                // Demo user expired असेल तर block करा
+                if (matchedUser.isDemo && isDemoExpired()) {
+                    errEl.innerHTML = `<div style="text-align:center;">
+                        ⏰ <strong>Demo Account Expired!</strong><br>
+                        <span style="font-size:0.88em;">तुमचा 1 month demo period संपला आहे.<br>
+                        पूर्ण access साठी actual login घ्या.</span><br>
+                        <span style="font-size:0.82em;">📞 ICS Computers: <strong>9822053668</strong></span>
+                    </div>`;
+                    errEl.style.display = 'block';
+                    inp.value = '';
+                    return;
+                }
                 loginAttempts = 0;
                 currentLoggedInUser = matchedUser;
                 document.getElementById('loginScreen').style.display = 'none';
@@ -1988,8 +2189,30 @@
 
         // ── Expiry Banner ──
         function showExpiryBanner() {
-            const days = getDaysRemaining();
             const banner = document.getElementById('expiryBanner');
+
+            // Demo user साठी वेगळा banner
+            if (currentLoggedInUser && currentLoggedInUser.isDemo) {
+                const demoDays = getDemoDaysRemaining();
+                const demoExp  = getDemoExpiry();
+                const fmtDemo  = new Date(demoExp).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
+                if (demoDays <= 3) {
+                    banner.className = 'warn-red';
+                    banner.style.display = 'flex';
+                    banner.innerHTML = `🚨 <strong>Demo Account:</strong> फक्त <strong>${demoDays} दिवस</strong> उरले! (${fmtDemo}) | Actual login साठी: <strong>📞 9822053668</strong>`;
+                } else if (demoDays <= 7) {
+                    banner.className = 'warn-orange';
+                    banner.style.display = 'flex';
+                    banner.innerHTML = `⏰ <strong>Demo Account:</strong> <strong>${demoDays} दिवस</strong> उरले (${fmtDemo}). Actual account साठी ICS Computers ला संपर्क करा.`;
+                } else {
+                    banner.className = 'warn-yellow';
+                    banner.style.display = 'flex';
+                    banner.innerHTML = `🎓 <strong>Demo Mode चालू आहे</strong> — ${demoDays} दिवस उरले (${fmtDemo}). आवडले तर actual login घ्या: <strong>📞 9822053668</strong>`;
+                }
+                return;
+            }
+
+            const days = getDaysRemaining();
             const expDate = getExpiryDate();
             const formatted = new Date(expDate).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
 
@@ -3439,6 +3662,7 @@ ${paymentsText}
             // तिन्ही data sources गोळा करा
             const enquiries = JSON.parse(localStorage.getItem('icsEnquiries') || '[]');
             const expenses  = JSON.parse(localStorage.getItem('icsExpenses')  || '[]');
+            const batches   = JSON.parse(localStorage.getItem('icsBatches')   || '{}');
 
             const totalRecords = students.length + enquiries.length + expenses.length;
             if (totalRecords === 0) {
@@ -3461,11 +3685,13 @@ ${paymentsText}
                 summary: {
                     totalStudents:  students.length,
                     totalEnquiries: enquiries.length,
-                    totalExpenses:  expenses.length
+                    totalExpenses:  expenses.length,
+                    totalBatches:   Object.keys(batches).length
                 },
                 students:   students,
                 enquiries:  enquiries,
-                expenses:   expenses
+                expenses:   expenses,
+                batches:    batches
             };
 
             const json = JSON.stringify(backup, null, 2);
@@ -3487,7 +3713,8 @@ ${paymentsText}
                 '   👨‍🎓 Students   : ' + students.length  + '\n' +
                 '   📋 Enquiries  : ' + enquiries.length + '\n' +
                 '   💸 Expenses   : ' + expenses.length  + '\n' +
-                '   📦 Total      : ' + totalRecords     + ' records'
+                '   🕐 Batches    : ' + Object.keys(batches).filter(function(k){ return batches[k].length>0; }).length + '\n' +
+                '   📦 Total      : ' + (students.length + enquiries.length + expenses.length) + ' records'
             );
         }
 
@@ -3513,6 +3740,7 @@ ${paymentsText}
                     const bkStudents  = backup.students   || [];
                     const bkEnquiries = backup.enquiries  || [];
                     const bkExpenses  = backup.expenses   || [];
+                    const bkBatches   = backup.batches    || {};
 
                     const curEnquiries = JSON.parse(localStorage.getItem('icsEnquiries') || '[]');
                     const curExpenses  = JSON.parse(localStorage.getItem('icsExpenses')  || '[]');
@@ -3564,6 +3792,9 @@ ${paymentsText}
                         // Expenses restore
                         localStorage.setItem('icsExpenses', JSON.stringify(bkExpenses));
 
+                        // Batches restore
+                        localStorage.setItem('icsBatches', JSON.stringify(bkBatches));
+
                         // UI refresh
                         updateStatistics();
                         displayStudents();
@@ -3575,7 +3806,8 @@ ${paymentsText}
                             '✅ Full Restore successful!\n\n' +
                             '👨‍🎓 Students   : ' + bkStudents.length  + '\n' +
                             '📋 Enquiries  : ' + bkEnquiries.length + '\n' +
-                            '💸 Expenses   : ' + bkExpenses.length  + '\n\n' +
+                            '💸 Expenses   : ' + bkExpenses.length  + '\n' +
+                            '🕐 Batches    : ' + Object.keys(bkBatches).length + '\n\n' +
                             'User: @' + username
                         );
 
@@ -4157,58 +4389,10 @@ function switchTab(tabId) {
     document.getElementById('tab-' + tabId).classList.add('active');
 
     // Refresh tab-specific data
-    if (tabId === 'receipt') renderReceiptTab();
     if (tabId === 'enquiry') renderEnquiries();
     if (tabId === 'expenses') renderExpenses();
     if (tabId === 'settings') loadSettingsTab();
-}
-
-// ══════════════════════════════════════════════
-// PAYMENT RECEIPT TAB
-// ══════════════════════════════════════════════
-function renderReceiptTab(data) {
-    var list = data !== undefined ? data : students;
-    var tbody = document.getElementById('receiptTableBody');
-    if (!tbody) return;
-    if (list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><div style="font-size:2.5em;">🧾</div><p>कोणताही student सापडला नाही.</p></td></tr>';
-        return;
-    }
-    var sorted = list.slice().sort(function(a,b){ return b.receiptNo - a.receiptNo; });
-    tbody.innerHTML = sorted.map(function(s) {
-        var st = s.balance === 0 ? '<span class="badge badge-success">Paid</span>' :
-                 s.paidFees > 0  ? '<span class="badge badge-warning">Partial</span>' :
-                                   '<span class="badge badge-danger">Pending</span>';
-        return '<tr>' +
-            '<td><strong>' + s.receiptNo + '</strong></td>' +
-            '<td>' + s.name + '</td>' +
-            '<td>' + s.mobile + '</td>' +
-            '<td>' + s.course + '</td>' +
-            '<td>₹' + s.totalFees.toLocaleString('en-IN') + '</td>' +
-            '<td>₹' + s.paidFees.toLocaleString('en-IN') + '</td>' +
-            '<td><strong>₹' + s.balance.toLocaleString('en-IN') + '</strong></td>' +
-            '<td>' + st + '</td>' +
-            '<td><button class="btn btn-info btn-small" onclick="downloadReceipt(' + s.id + ')">📄 Download</button>' +
-            (s.balance > 0 ? '<button class="btn btn-success btn-small" onclick="openPaymentModal(' + s.id + '); switchTab(\'dashboard\')" style="margin-top:4px;">💰 Pay</button>' : '') +
-            '</td></tr>';
-    }).join('');
-}
-
-function searchForReceipt() {
-    var term = document.getElementById('receiptSearchInput').value.toLowerCase().trim();
-    if (!term) { renderReceiptTab(); return; }
-    var filtered = students.filter(function(s) {
-        return s.name.toLowerCase().includes(term) ||
-               s.mobile.includes(term) ||
-               String(s.receiptNo).includes(term) ||
-               s.course.toLowerCase().includes(term);
-    });
-    renderReceiptTab(filtered);
-}
-
-function showAllForReceipt() {
-    document.getElementById('receiptSearchInput').value = '';
-    renderReceiptTab();
+    if (tabId === 'center') loadCenterTab();
 }
 
 // ══════════════════════════════════════════════
@@ -4394,6 +4578,442 @@ function exportEnquiryExcel() {
 
     alert('✅ Enquiry Excel export झाली!\n\n📄 File: ' + fileName + '\n📊 Records: ' + data.length + ' (' + filterLabel + ')\n\n💡 Excel मध्ये उघडा — columns आणि data व्यवस्थित दिसेल.');
 }
+
+// ══════════════════════════════════════════════
+// CENTER TAB — BATCH MANAGEMENT (v2)
+// ══════════════════════════════════════════════
+
+var ALL_BATCH_SLOTS = [
+    '7-8 AM','8-9 AM','9-10 AM','10-11 AM','11-12 PM',
+    '12-1 PM','1-2 PM','2-3 PM','3-4 PM','4-5 PM',
+    '5-6 PM','6-7 PM','7-8 PM'
+];
+
+var SLOT_EMOJI = {
+    '7-8 AM':'🌅','8-9 AM':'🌄','9-10 AM':'☀️','10-11 AM':'🌤️',
+    '11-12 PM':'🌞','12-1 PM':'🕛','1-2 PM':'🌻','2-3 PM':'☁️',
+    '3-4 PM':'🌥️','4-5 PM':'🌇','5-6 PM':'🌆','6-7 PM':'🌃','7-8 PM':'🌙'
+};
+
+function getBatches() {
+    return JSON.parse(localStorage.getItem('icsBatches') || '{}');
+}
+function saveBatches(obj) {
+    localStorage.setItem('icsBatches', JSON.stringify(obj));
+}
+
+// ── सर्व assigned student IDs एका Set मध्ये ──
+function getAllAssignedIds() {
+    var batches = getBatches();
+    var ids = new Set();
+    Object.values(batches).forEach(function(arr) {
+        arr.forEach(function(id) { ids.add(id); });
+    });
+    return ids;
+}
+
+// ── कोणत्या batch मध्ये student आहे ──
+function getStudentBatch(studentId) {
+    var batches = getBatches();
+    for (var slot in batches) {
+        if (batches[slot].includes(studentId)) return slot;
+    }
+    return null;
+}
+
+function loadCenterTab() {
+    updateBatchStats();
+    renderBatchSummary();
+    var sel = document.getElementById('batchSelect');
+    if (sel) sel.value = '';
+    document.getElementById('batchStudentSelectWrap').style.display = 'none';
+    document.getElementById('batchSelectPrompt').style.display = 'block';
+    document.getElementById('batchInfoBox').style.display = 'none';
+}
+
+function updateBatchStats() {
+    var batches = getBatches();
+    var assignedIds = getAllAssignedIds();
+    var activeBatches = ALL_BATCH_SLOTS.filter(function(s){ return (batches[s]||[]).length > 0; }).length;
+    var unassigned = students.length - assignedIds.size;
+
+    var s = function(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; };
+    s('batchStatTotal',      activeBatches);
+    s('batchStatStudents',   students.length);
+    s('batchStatAssigned',   assignedIds.size);
+    s('batchStatUnassigned', unassigned < 0 ? 0 : unassigned);
+}
+
+function onBatchSelect() {
+    var slot = document.getElementById('batchSelect').value;
+    var wrap   = document.getElementById('batchStudentSelectWrap');
+    var prompt = document.getElementById('batchSelectPrompt');
+    var info   = document.getElementById('batchInfoBox');
+
+    if (!slot) {
+        wrap.style.display = 'none';
+        prompt.style.display = 'block';
+        info.style.display = 'none';
+        return;
+    }
+
+    wrap.style.display = 'block';
+    prompt.style.display = 'none';
+    document.getElementById('batchStudentSearch').value = '';
+    refreshBatchLeftPanel(slot);
+}
+
+// ── Left panel refresh: unassigned students दाखवणे ──
+function refreshBatchLeftPanel(slot) {
+    if (!slot) return;
+    var batches  = getBatches();
+    var assigned = batches[slot] || [];
+    var allAssigned = getAllAssignedIds();
+
+    // Info box update
+    var info = document.getElementById('batchInfoBox');
+    if (info) {
+        info.style.display = 'block';
+        info.innerHTML = SLOT_EMOJI[slot] + ' <strong>' + slot + '</strong> — ' +
+            '<strong>' + assigned.length + '</strong> students assigned' +
+            ' &nbsp;|&nbsp; ' +
+            '<strong>' + (students.length - allAssigned.size) + '</strong> unassigned';
+    }
+
+    var term = (document.getElementById('batchStudentSearch') || {}).value || '';
+    renderBatchStudentList(slot, term);
+}
+
+// ── फक्त UNASSIGNED students दाखवणे ──
+function renderBatchStudentList(slot, searchTerm) {
+    var allAssigned = getAllAssignedIds();
+    var container   = document.getElementById('batchStudentList');
+    if (!container) return;
+
+    // Unassigned students (किसीही batch मध्ये नाहीत)
+    var unassigned = students.filter(function(s) {
+        return !allAssigned.has(s.id);
+    });
+
+    // Search filter
+    var term = (searchTerm || '').toLowerCase().trim();
+    if (term) {
+        unassigned = unassigned.filter(function(s) {
+            return s.name.toLowerCase().includes(term) ||
+                   s.mobile.includes(term) ||
+                   s.course.toLowerCase().includes(term);
+        });
+    }
+
+    // Unassigned count badge update
+    var badge = document.getElementById('unassignedCountBadge');
+    if (badge) badge.textContent = students.filter(function(s){ return !allAssigned.has(s.id); }).length;
+
+    if (unassigned.length === 0) {
+        var msg = allAssigned.size >= students.length
+            ? '<div style="padding:18px; text-align:center; color:var(--success); font-size:0.88em; font-weight:600;">✅ सर्व students assigned आहेत!</div>'
+            : '<div style="padding:18px; text-align:center; color:var(--text-light); font-size:0.88em;">कोणताही student सापडला नाही.</div>';
+        container.innerHTML = msg;
+        updateBatchSelectedCount();
+        return;
+    }
+
+    container.innerHTML = unassigned.map(function(s) {
+        var statusLabel = s.balance === 0
+            ? '<span style="font-size:0.7em;background:#c8e6d4;color:#1b4332;padding:1px 6px;border-radius:8px;font-weight:600;margin-left:4px;">Paid</span>'
+            : s.paidFees > 0
+            ? '<span style="font-size:0.7em;background:#fde8c3;color:#7a4f10;padding:1px 6px;border-radius:8px;font-weight:600;margin-left:4px;">Partial</span>'
+            : '<span style="font-size:0.7em;background:#f5cece;color:#5c1a1a;padding:1px 6px;border-radius:8px;font-weight:600;margin-left:4px;">Pending</span>';
+
+        var safeSlot = slot.replace(/'/g,"\\'");
+        return '<div class="batch-student-item" id="bsi-' + s.id + '" onclick="toggleBatchCheckbox(' + s.id + ')">' +
+            '<input type="checkbox" id="bsc-' + s.id + '" onclick="event.stopPropagation(); toggleBatchCheckbox(' + s.id + ')">' +
+            '<div style="flex:1; min-width:0;">' +
+            '<div style="font-weight:600; font-size:0.88em; color:var(--text-dark);">' + s.name + statusLabel + '</div>' +
+            '<div style="font-size:0.76em; color:var(--text-mid); margin-top:1px;">📚 ' + s.course + ' • 📱 ' + s.mobile + '</div>' +
+            '</div>' +
+            '<div style="font-size:0.75em; color:var(--text-light); flex-shrink:0;">#' + s.receiptNo + '</div>' +
+            '</div>';
+    }).join('');
+
+    updateBatchSelectedCount();
+}
+
+function toggleBatchCheckbox(studentId) {
+    var cb  = document.getElementById('bsc-' + studentId);
+    var row = document.getElementById('bsi-' + studentId);
+    if (!cb || !row) return;
+    cb.checked = !cb.checked;
+    row.classList.toggle('selected', cb.checked);
+    updateBatchSelectedCount();
+}
+
+function updateBatchSelectedCount() {
+    var checked = document.querySelectorAll('#batchStudentList input[type="checkbox"]:checked').length;
+    var el = document.getElementById('batchSelectedCount');
+    if (el) el.textContent = checked + ' selected';
+}
+
+function filterBatchStudentList() {
+    var slot = document.getElementById('batchSelect').value;
+    var term = document.getElementById('batchStudentSearch').value;
+    if (slot) renderBatchStudentList(slot, term);
+}
+
+function batchSelectAll() {
+    document.querySelectorAll('#batchStudentList input[type="checkbox"]').forEach(function(cb) {
+        cb.checked = true;
+        var row = cb.closest('.batch-student-item');
+        if (row) row.classList.add('selected');
+    });
+    updateBatchSelectedCount();
+}
+
+function batchClearAll() {
+    document.querySelectorAll('#batchStudentList input[type="checkbox"]').forEach(function(cb) {
+        cb.checked = false;
+        var row = cb.closest('.batch-student-item');
+        if (row) row.classList.remove('selected');
+    });
+    updateBatchSelectedCount();
+}
+
+// ── Selected students या batch मध्ये add करा ──
+function assignSelectedToBatch() {
+    var slot = document.getElementById('batchSelect').value;
+    if (!slot) { alert('⚠️ आधी batch निवडा!'); return; }
+
+    var checked = document.querySelectorAll('#batchStudentList input[type="checkbox"]:checked');
+    if (checked.length === 0) {
+        alert('⚠️ कोणताही student select केला नाही!\nCheckbox tick करा मग Add करा.');
+        return;
+    }
+
+    var batches = getBatches();
+    if (!batches[slot]) batches[slot] = [];
+    var added = 0;
+
+    checked.forEach(function(cb) {
+        var id = parseInt(cb.id.replace('bsc-', ''));
+        if (!isNaN(id) && !batches[slot].includes(id)) {
+            batches[slot].push(id);
+            added++;
+        }
+    });
+
+    saveBatches(batches);
+    updateBatchStats();
+    renderBatchSummary();
+    refreshBatchLeftPanel(slot); // list refresh — assigned students आता दिसणार नाहीत
+    batchClearAll();
+
+    // Success toast
+    showBatchToast('✅ ' + added + ' student' + (added !== 1 ? 's' : '') + ' → ' + slot + ' मध्ये add झाले!', 'success');
+}
+
+// ── Student ला batch मधून remove करा ──
+function removeFromBatch(studentId, slot) {
+    var batches = getBatches();
+    if (!batches[slot]) return;
+    batches[slot] = batches[slot].filter(function(id) { return id !== studentId; });
+    if (batches[slot].length === 0) delete batches[slot];
+    saveBatches(batches);
+
+    updateBatchStats();
+    renderBatchSummary();
+
+    // Left panel refresh if same slot selected
+    var currentSlot = document.getElementById('batchSelect').value;
+    if (currentSlot) refreshBatchLeftPanel(currentSlot);
+
+    var st = students.find(function(s){ return s.id === studentId; });
+    showBatchToast('↩️ ' + (st ? st.name : 'Student') + ' → unassigned झाला', 'info');
+}
+
+// ── Student ची batch change करा ──
+function changeBatch(studentId, newSlot) {
+    if (!newSlot) return;
+    var batches = getBatches();
+
+    // जुन्या batch मधून remove
+    Object.keys(batches).forEach(function(slot) {
+        batches[slot] = batches[slot].filter(function(id){ return id !== studentId; });
+        if (batches[slot].length === 0) delete batches[slot];
+    });
+
+    // नवीन batch मध्ये add
+    if (!batches[newSlot]) batches[newSlot] = [];
+    if (!batches[newSlot].includes(studentId)) batches[newSlot].push(studentId);
+
+    saveBatches(batches);
+    updateBatchStats();
+    renderBatchSummary();
+
+    var currentSlot = document.getElementById('batchSelect').value;
+    if (currentSlot) refreshBatchLeftPanel(currentSlot);
+
+    var st = students.find(function(s){ return s.id === studentId; });
+    showBatchToast('🔄 ' + (st ? st.name : 'Student') + ' → ' + newSlot + ' मध्ये move झाला', 'success');
+}
+
+// ── Right panel: Batch Summary with delete + change ──
+function renderBatchSummary() {
+    var batches = getBatches();
+    var slots = ALL_BATCH_SLOTS.filter(function(s){ return batches[s] && batches[s].length > 0; });
+    var cont = document.getElementById('batchSummaryContainer');
+    if (!cont) return;
+
+    if (slots.length === 0) {
+        cont.innerHTML = '<div class="empty-state"><div style="font-size:2.5em;">🏫</div><p>कोणत्याही batch मध्ये students नाहीत.<br>डाव्या बाजूने batch निवडून students add करा.</p></div>';
+        return;
+    }
+
+    cont.innerHTML = slots.map(function(slot) {
+        var ids = batches[slot] || [];
+        var slotStudents = ids.map(function(id){ return students.find(function(s){ return s.id === id; }); }).filter(Boolean);
+        var emoji = SLOT_EMOJI[slot] || '🕐';
+
+        // Change batch options (current slot exclude)
+        var otherSlots = ALL_BATCH_SLOTS.filter(function(s){ return s !== slot; });
+        var changeOpts = otherSlots.map(function(s){
+            return '<option value="' + s + '">' + (SLOT_EMOJI[s]||'') + ' ' + s + '</option>';
+        }).join('');
+
+        var rows = slotStudents.map(function(s) {
+            var statusDot = s.balance === 0 ? '🟢' : s.paidFees > 0 ? '🟡' : '🔴';
+            return '<div style="display:flex; align-items:center; gap:8px; padding:8px 12px; border-bottom:1px solid #ede6db; flex-wrap:wrap;">' +
+                '<div style="flex:1; min-width:0;">' +
+                '<div style="font-size:0.88em; font-weight:600; color:var(--text-dark);">' + statusDot + ' ' + s.name + '</div>' +
+                '<div style="font-size:0.75em; color:var(--text-mid);">📚 ' + s.course + ' • 📱 ' + s.mobile + '</div>' +
+                '</div>' +
+                // Batch change dropdown
+                '<select onchange="changeBatch(' + s.id + ', this.value); this.value=\'\'" ' +
+                    'title="Batch बदला" ' +
+                    'style="padding:3px 6px; font-size:0.75em; border:1.5px solid var(--border); border-radius:6px; background:#fdfaf6; color:var(--text-dark); font-family:\'DM Sans\',sans-serif; cursor:pointer; flex-shrink:0;">' +
+                '<option value="">🔄 Change</option>' + changeOpts +
+                '</select>' +
+                // Delete button
+                '<button onclick="removeFromBatch(' + s.id + ',\'' + slot.replace(/'/g,"\\'") + '\')" ' +
+                    'title="Batch मधून remove करा" ' +
+                    'style="padding:4px 9px; background:linear-gradient(135deg,#8b2a2a,#b03a3a); color:white; border:none; border-radius:6px; font-size:0.8em; cursor:pointer; flex-shrink:0; font-weight:700;">🗑️</button>' +
+                '</div>';
+        }).join('');
+
+        return '<div class="batch-slot-card" style="margin-bottom:12px;">' +
+            '<div class="batch-slot-header" style="display:flex; justify-content:space-between; align-items:center;">' +
+            '<span>' + emoji + ' <strong>' + slot + '</strong></span>' +
+            '<span style="background:rgba(200,115,42,0.5); padding:2px 10px; border-radius:12px; font-size:0.82em;">' + slotStudents.length + ' Students</span>' +
+            '</div>' +
+            '<div style="padding:0;">' + rows + '</div>' +
+            '</div>';
+    }).join('');
+}
+
+// ── Toast notification ──
+function showBatchToast(msg, type) {
+    var existing = document.getElementById('batchToast');
+    if (existing) existing.remove();
+    var colors = { success: '#2d6a4f:#c8e6d4', info: '#1a3a4a:#d0e8f5', warn: '#7a4f10:#fde8c3' };
+    var c = (colors[type] || colors.info).split(':');
+    var toast = document.createElement('div');
+    toast.id = 'batchToast';
+    toast.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:' + c[0] + ';color:white;padding:10px 22px;border-radius:10px;font-size:0.9em;font-weight:600;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,0.25);border:1.5px solid ' + c[1] + ';max-width:90vw;text-align:center;';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(function(){ if (toast.parentNode) toast.remove(); }, 2800);
+}
+
+function saveBatchStudents() {
+    // legacy — now auto-saved, just refresh
+    var slot = document.getElementById('batchSelect').value;
+    updateBatchStats();
+    renderBatchSummary();
+    if (slot) refreshBatchLeftPanel(slot);
+}
+
+function exportBatchExcel() {
+    var batches = getBatches();
+    var slots = ALL_BATCH_SLOTS.filter(function(s){ return batches[s] && batches[s].length > 0; });
+
+    if (slots.length === 0) {
+        alert('⚠️ Export साठी कोणत्याही batch मध्ये students नाहीत!\nआधी students assign करा.');
+        return;
+    }
+
+    var ci = window.currentCenterInfo || { centerName: 'ICS Computers' };
+    var now = new Date();
+    var dateStr = now.toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
+    var BOM = '\uFEFF';
+
+    var csv = BOM;
+    csv += '"' + ci.centerName.toUpperCase() + ' — Batch / Time Slot Report"\n';
+    csv += '"Generated: ' + dateStr + '  |  Total Batches: ' + slots.length + '"\n';
+    csv += '\n';
+
+    // Overall summary sheet
+    csv += '"=== BATCH SUMMARY ==="\n';
+    csv += '"Batch / Slot","Total Students","Student Names"\n';
+    slots.forEach(function(slot) {
+        var ids = batches[slot] || [];
+        var slotStudents = ids.map(function(id){ return students.find(function(s){ return s.id === id; }); }).filter(Boolean);
+        var names = slotStudents.map(function(s){ return s.name; }).join(' | ');
+        csv += '"' + slot + '","' + slotStudents.length + '","' + names + '"\n';
+    });
+    csv += '\n';
+
+    // Detailed section — each slot with full student details
+    csv += '"=== DETAILED BATCH DATA ==="\n';
+
+    slots.forEach(function(slot) {
+        var ids = batches[slot] || [];
+        var slotStudents = ids.map(function(id){ return students.find(function(s){ return s.id === id; }); }).filter(Boolean);
+
+        csv += '\n"BATCH: ' + slot + '  (' + slotStudents.length + ' Students)"\n';
+        csv += '"Sr.","Receipt No.","Student Name","Mobile","Course","Total Fees","Paid Fees","Balance","Status"\n';
+
+        slotStudents.forEach(function(s, i) {
+            var status = s.balance === 0 ? 'Paid' : s.paidFees > 0 ? 'Partial' : 'Pending';
+            csv += [
+                i + 1,
+                s.receiptNo,
+                '"' + s.name.replace(/"/g,'""') + '"',
+                '"' + s.mobile + '"',
+                '"' + s.course + '"',
+                s.totalFees,
+                s.paidFees,
+                s.balance,
+                '"' + status + '"'
+            ].join(',') + '\n';
+        });
+    });
+
+    // Footer stats
+    csv += '\n"=== STATISTICS ==="\n';
+    var totalAssignedIds = new Set();
+    slots.forEach(function(slot){ (batches[slot]||[]).forEach(function(id){ totalAssignedIds.add(id); }); });
+    csv += '"Total Active Batches","' + slots.length + '"\n';
+    csv += '"Total Students (all)","' + students.length + '"\n';
+    csv += '"Assigned Students","' + totalAssignedIds.size + '"\n';
+    csv += '"Unassigned Students","' + (students.length - totalAssignedIds.size) + '"\n';
+
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    var fileName = (ci.centerName.replace(/\s+/g,'_') || 'ICS') + '_Batch_Report_' +
+        now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + '.csv';
+    a.href = url;
+    a.download = fileName;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    alert('✅ Batch Excel Export झाली!\n\n📄 File: ' + fileName + '\n🕐 Batches: ' + slots.length + '\n👨‍🎓 Assigned: ' + totalAssignedIds.size + ' students');
+}
+
+// Also include batch data in full backup/restore
+// (handled via localStorage key 'icsBatches' — already part of clearAndResetStorage)
 
 // Populate enquiry course dropdown
 function populateEnquiryCourseDrop() {
@@ -4596,10 +5216,31 @@ function loadSettingsTab() {
         el('settDaysDisplay').className = 'value ' + (days <= 0 ? 'danger' : days <= 15 ? 'warn' : 'ok');
     }
 
+    // Account Info panel — सर्व users ना दिसेल
+    if (currentLoggedInUser) {
+        var uname = currentLoggedInUser.username || '—';
+        var urole = currentLoggedInUser.role === 'admin' ? '🛡️ Admin' : '👤 Staff User';
+        var expD  = getExpiryDate ? getExpiryDate() : '—';
+        var daysR = getDaysRemaining ? getDaysRemaining() : 0;
+        var fmtExp = expD !== '—' ? new Date(expD).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) : '—';
+        var daysColor = daysR <= 0 ? 'var(--danger)' : daysR <= 15 ? 'var(--accent)' : 'var(--success)';
+        var daysText  = daysR <= 0 ? '⛔ EXPIRED' : daysR + ' days';
+        if (el('userInfoUsername')) el('userInfoUsername').textContent = uname;
+        if (el('userInfoRole'))     el('userInfoRole').textContent = urole;
+        if (el('userInfoExpiry'))   el('userInfoExpiry').textContent = fmtExp;
+        if (el('userInfoDays')) {
+            el('userInfoDays').textContent = daysText;
+            el('userInfoDays').style.color = daysColor;
+        }
+    }
+
     // Hide admin-only sections for regular users
     var isAdmin = currentLoggedInUser && currentLoggedInUser.role === 'admin';
     var adminSections = document.querySelectorAll('.admin-only-setting');
     adminSections.forEach(function(s){ s.style.display = isAdmin ? '' : 'none'; });
+    // Hide admin-only buttons inside shared panels
+    var adminBtns = document.querySelectorAll('.admin-only-btn');
+    adminBtns.forEach(function(b){ b.style.display = isAdmin ? '' : 'none'; });
 }
 
 function toggleSettPwd(fieldId) {
