@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ICS Computers - Fees Management System</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&family=Bebas+Neue&family=Oswald:wght@600;700&display=swap');
 
@@ -108,6 +109,7 @@
             gap: 20px;
             margin-bottom: 20px;
         }
+
 
         .panel {
             background:
@@ -689,7 +691,45 @@
             color: var(--text-light);
             letter-spacing: 0.5px;
         }
-        .login-attempts {
+        /* ── QUICK ACTIONS DROPDOWN ── */
+        .qa-btn {
+            width: 100%;
+            padding: 7px 12px;
+            border: none;
+            border-radius: 7px;
+            font-size: 0.82em;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: 0.2px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: white;
+            background: linear-gradient(135deg, var(--qa-c1, #1e4d5e) 0%, var(--qa-c2, #2a6d84) 100%);
+            border-left: 3px solid var(--qa-bdr, #c8732a);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+        .qa-btn:hover {
+            transform: translateX(3px);
+            filter: brightness(1.1);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.22);
+        }
+        .qa-btn:active { transform: scale(0.97); }
+        .qa-sep {
+            border: none;
+            border-top: 1px dashed var(--border);
+            margin: 2px 0;
+        }
+        /* Dropdown scrollbar */
+        #qaDropInner::-webkit-scrollbar { width: 4px; }
+        #qaDropInner::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius:8px; }
+        #qaDropInner::-webkit-scrollbar-thumb { background: var(--accent); border-radius:8px; }
+
+                .login-attempts {
             font-size: 0.82em;
             color: var(--accent);
             margin-top: 8px;
@@ -1039,7 +1079,10 @@
             <p id="headerSubtitle">Fees Management System — Yeola, Nashik</p>
             <div class="header-actions">
                 <span class="header-user-badge" id="headerUserBadge">👤 Admin</span>
-                <button class="logout-btn" onclick="logoutNow()">🚪 Logout</button>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:3px;">
+                    <button class="logout-btn" onclick="logoutNow()">🚪 Logout</button>
+                    <span id="userExpiryBadge" style="display:none; font-size:0.7em; color:rgba(255,255,255,0.75); letter-spacing:0.3px;"></span>
+                </div>
             </div>
         </div>
 
@@ -1144,7 +1187,6 @@
                             <label>Total Fees <span class="required">*</span></label>
                             <input type="number" id="totalFees" placeholder="₹" min="0" required>
                         </div>
-
                         <div class="form-group">
                             <label>Paid Fees</label>
                             <input type="number" id="paidFees" placeholder="₹" min="0" value="0">
@@ -1162,34 +1204,25 @@
                 </form>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="panel">
+            <!-- Charts Panel (Right Side) -->
+            <div class="panel" style="display:flex; flex-direction:column; gap:18px;">
                 <div class="panel-header">
-                    <h2>⚡ Quick Actions</h2>
+                    <h2>📊 Dashboard Charts</h2>
                 </div>
 
-                <div style="display: grid; gap: 15px;">
-                    <button class="btn btn-success" onclick="exportToExcel()">
-                        📊 Export to Excel
-                    </button>
-                    <button class="btn" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; border-bottom: 3px solid #a78bfa; box-shadow: 0 4px 15px rgba(124,58,237,0.3);" onclick="exportToTally()">
-                        📥 Export to Tally (XML)
-                    </button>
-                    <button class="btn" style="background: linear-gradient(135deg, #1a3a4a 0%, #1e4d5e 100%); color: white; border-bottom: 3px solid #c8732a;" onclick="openGenerateReportModal()">
-                        📋 Generate Report
-                    </button>
-
-                    <div style="border-top: 2px dashed var(--border); margin: 5px 0;"></div>
-
-                    <button class="btn" style="background: linear-gradient(135deg, #2d5016 0%, #4a7c22 100%); color: white; border-bottom: 3px solid #8bc34a;" onclick="backupData()">
-                        💾 Backup Data (JSON)
-                    </button>
-                    <button class="btn" style="background: linear-gradient(135deg, #1a3060 0%, #2d4fa8 100%); color: white; border-bottom: 3px solid #7b9ef0;" onclick="document.getElementById('restoreFileInput').click()">
-                        📂 Restore Data (JSON)
-                    </button>
-                    <input type="file" id="restoreFileInput" accept=".json" style="display:none;" onchange="restoreData(event)">
+                <!-- Payment Status Donut Chart -->
+                <div style="background:var(--bg-panel-alt); border-radius:12px; padding:16px; border:1px solid var(--border);">
+                    <div style="font-weight:700; font-size:0.88em; color:var(--text-dark); margin-bottom:12px; letter-spacing:0.3px;">💰 Payment Status</div>
+                    <div style="display:flex; align-items:center; gap:16px;">
+                        <canvas id="paymentDonutChart" width="130" height="130" style="flex-shrink:0;"></canvas>
+                        <div id="paymentChartLegend" style="flex:1; display:flex; flex-direction:column; gap:7px; font-size:0.82em;"></div>
+                    </div>
                 </div>
+
+
+
             </div>
+
         </div>
 
         <!-- Search and Filter -->
@@ -1267,6 +1300,10 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label>Address / पत्ता</label>
+                    <input type="text" id="enqAddress" placeholder="घर/गाव/वस्ती पत्ता टाका">
+                </div>
+                <div class="form-group">
                     <label>Notes / Remark</label>
                     <input type="text" id="enqNote" placeholder="कोणत्याही notes...">
                 </div>
@@ -1290,6 +1327,13 @@
                             📊 Excel Export
                         </button>
                     </div>
+                </div>
+
+                <!-- Text Search -->
+                <div style="margin-bottom:12px;">
+                    <input type="text" id="enqSearchBox" oninput="renderEnquiries()"
+                        placeholder="🔍 नाव, मोबाईल, course, पत्ता... शोधा"
+                        style="width:100%; padding:9px 14px; border:2px solid var(--border); border-radius:8px; font-size:0.93em; background:#fdfaf6; color:var(--text-dark); font-family:'DM Sans',sans-serif; transition:border-color 0.2s;">
                 </div>
 
                 <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:16px;" id="enqStatsRow">
@@ -1467,33 +1511,7 @@
                 <button class="btn btn-primary" onclick="openCourseManager()">⚙️ Open Course Manager</button>
             </div>
 
-            <!-- Account Info — सर्व users ना दिसेल -->
-            <div class="panel" id="userAccountInfoPanel">
-                <div class="panel-header"><h2>📋 Account Information</h2></div>
-                <div style="display:grid; gap:10px;">
-                    <div style="background:white; border-radius:8px; padding:12px 16px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-                        <span style="color:var(--text-mid); font-weight:600;">👤 Username:</span>
-                        <span id="userInfoUsername" style="font-weight:700; color:var(--text-dark);">—</span>
-                    </div>
-                    <div style="background:white; border-radius:8px; padding:12px 16px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-                        <span style="color:var(--text-mid); font-weight:600;">🛡️ Role:</span>
-                        <span id="userInfoRole" style="font-weight:700; color:var(--text-dark);">—</span>
-                    </div>
-                    <div style="background:white; border-radius:8px; padding:12px 16px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-                        <span style="color:var(--text-mid); font-weight:600;">📅 Software Expiry Date:</span>
-                        <span id="userInfoExpiry" style="font-weight:700;">—</span>
-                    </div>
-                    <div style="background:white; border-radius:8px; padding:12px 16px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-                        <span style="color:var(--text-mid); font-weight:600;">⏳ Days Remaining:</span>
-                        <span id="userInfoDays" style="font-weight:700;">—</span>
-                    </div>
-                </div>
-                <div style="margin-top:12px; font-size:0.82em; color:var(--text-light); text-align:center;">
-                    📞 Renew साठी संपर्क करा: <strong>ICS Computers — 9822053668</strong>
-                </div>
-            </div>
-
-            <!-- Data Management (सर्वांना दिसेल, Clear buttons फक्त Admin ला) -->
+            <!-- Data Management — Backup/Restore सर्वांना, Clear फक्त Admin ला -->
             <div class="panel">
                 <div class="panel-header"><h2>🗄️ Data Management</h2></div>
                 <div style="display:grid; gap:12px;">
@@ -1502,9 +1520,12 @@
                     <input type="file" id="restoreFileInput2" accept=".json" style="display:none;" onchange="restoreData(event)">
                     <button class="btn btn-success" onclick="exportToExcel()">📊 Export to Excel</button>
                     <button class="btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9); color:white; border-bottom:3px solid #a78bfa;" onclick="exportToTally()">📥 Export to Tally (XML)</button>
-                    <div style="border-top:2px dashed var(--border); margin:4px 0;"></div>
-                    <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Student Data</button>
-                    <button class="btn" style="background:linear-gradient(135deg,#6b1a1a,#a02020); color:white; border-bottom:3px solid #e05555;" onclick="clearAndResetStorage()">🔄 Clear &amp; Reset All Storage</button>
+                    <button class="btn" style="background:linear-gradient(135deg,#1a3a4a,#1e4d5e); color:white; border-bottom:3px solid #c8732a;" onclick="openGenerateReportModal()">📋 Generate Report</button>
+                    <div class="admin-only-setting" style="display:grid; gap:12px; margin-top:4px;">
+                        <div style="border-top:2px dashed var(--border);"></div>
+                        <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Student Data</button>
+                        <button class="btn" style="background:linear-gradient(135deg,#6b1a1a,#a02020); color:white; border-bottom:3px solid #e05555;" onclick="clearAndResetStorage()">🔄 Clear &amp; Reset All Storage</button>
+                    </div>
                 </div>
             </div>
 
@@ -1789,9 +1810,6 @@
         <button class="login-btn" onclick="doLogin()">🔓 Login to System</button>
 
         <div class="login-attempts" id="loginAttempts"></div>
-
-
-
         <div class="login-footer">
             Fees Management System · v3.0
         </div>
@@ -1944,6 +1962,28 @@
                             placeholder="e.g. 9876543210" maxlength="10" />
                     </div>
                 </div>
+                <div style="border-top:1px dashed var(--border); margin:10px 0 12px; padding-top:10px;">
+                    <div style="font-size:0.8em; font-weight:700; color:#8b2a2a; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">⏳ User Expiry</div>
+                    <div class="form-row" style="margin-bottom:0;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label style="font-size:0.8em;">Expiry Date <span class="required">*</span></label>
+                            <input type="date" id="umExpiryDate"
+                                style="width:100%; padding:9px 12px; border:2px solid var(--border); border-radius:7px; font-size:0.93em; background:#fdfaf6; font-family:'DM Sans',sans-serif;" />
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label style="font-size:0.8em;">Quick Set</label>
+                            <select id="umExpiryQuick" onchange="setUserExpiryQuick()"
+                                style="width:100%; padding:9px 12px; border:2px solid var(--border); border-radius:7px; font-size:0.93em; background:#fdfaf6; font-family:'DM Sans',sans-serif;">
+                                <option value="">-- निवडा --</option>
+                                <option value="1m">1 महिना</option>
+                                <option value="3m">3 महिने</option>
+                                <option value="6m">6 महिने</option>
+                                <option value="1y">1 वर्ष</option>
+                                <option value="2y">2 वर्षे</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <button class="btn btn-primary" onclick="addNewUser()" style="width:100%; padding:9px; font-size:0.9em; margin-top:2px;">
                     ✅ Create User
                 </button>
@@ -1977,6 +2017,203 @@
 </div>
 
     <script>
+    // ══════════════════════════════════════════════════════════
+    //  ICS IndexedDB Storage — localStorage replacement
+    //  Cache clear केली तरी data safe राहतो!
+    //  सर्व localStorage calls आपोआप IndexedDB मध्ये जातात.
+    // ══════════════════════════════════════════════════════════
+    (function() {
+        'use strict';
+
+        const DB_NAME    = 'ICSComputersDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'keyvalue';
+
+        // ── In-memory sync cache (localStorage सारखाच synchronous access) ──
+        const _cache = {};
+        let _dbReady = false;
+        let _db      = null;
+
+        // ── IndexedDB उघडणे ──
+        function openDB() {
+            return new Promise(function(resolve, reject) {
+                const req = indexedDB.open(DB_NAME, DB_VERSION);
+                req.onupgradeneeded = function(e) {
+                    e.target.result.createObjectStore(STORE_NAME, { keyPath: 'k' });
+                };
+                req.onsuccess = function(e) { resolve(e.target.result); };
+                req.onerror   = function(e) { reject(e.target.error); };
+            });
+        }
+
+        // ── सर्व keys IndexedDB मधून cache मध्ये load करणे ──
+        function loadAll(db) {
+            return new Promise(function(resolve, reject) {
+                const tx  = db.transaction(STORE_NAME, 'readonly');
+                const req = tx.objectStore(STORE_NAME).getAll();
+                req.onsuccess = function() {
+                    req.result.forEach(function(row) { _cache[row.k] = row.v; });
+                    resolve();
+                };
+                req.onerror = function() { reject(req.error); };
+            });
+        }
+
+        // ── IndexedDB मध्ये एक key-value save करणे (async background) ──
+        function persistSet(key, value) {
+            if (!_db) return;
+            try {
+                const tx = _db.transaction(STORE_NAME, 'readwrite');
+                tx.objectStore(STORE_NAME).put({ k: key, v: value });
+            } catch(e) { /* silent fail — cache is source of truth */ }
+        }
+
+        // ── IndexedDB मधून एक key delete करणे (async background) ──
+        function persistRemove(key) {
+            if (!_db) return;
+            try {
+                const tx = _db.transaction(STORE_NAME, 'readwrite');
+                tx.objectStore(STORE_NAME).delete(key);
+            } catch(e) { /* silent */ }
+        }
+
+        // ── localStorage ला पूर्णपणे replace करणारा wrapper ──
+        const idbStorage = {
+            getItem: function(key) {
+                return Object.prototype.hasOwnProperty.call(_cache, key) ? _cache[key] : null;
+            },
+            setItem: function(key, value) {
+                _cache[key] = String(value);
+                persistSet(key, String(value));
+            },
+            removeItem: function(key) {
+                delete _cache[key];
+                persistRemove(key);
+            },
+            clear: function() {
+                const keys = Object.keys(_cache);
+                keys.forEach(function(k) { delete _cache[k]; });
+                if (!_db) return;
+                try {
+                    const tx = _db.transaction(STORE_NAME, 'readwrite');
+                    tx.objectStore(STORE_NAME).clear();
+                } catch(e) { /* silent */ }
+            },
+            key: function(n) {
+                return Object.keys(_cache)[n] || null;
+            },
+            get length() {
+                return Object.keys(_cache).length;
+            }
+        };
+
+        // ── App initialization: DB उघडा, सर्व data load करा, मग page चालवा ──
+        // जोपर्यंत DB ready नाही, page एक loading screen दाखवतो.
+        const _origOnLoad = window.onload;
+
+        // Loading overlay दाखवणे
+        function showDBLoader() {
+            const div = document.createElement('div');
+            div.id = 'icsDbLoader';
+            div.style.cssText = [
+                'position:fixed','top:0','left:0','width:100%','height:100%',
+                'background:linear-gradient(135deg,#0f2a35,#1a3a4a)',
+                'display:flex','flex-direction:column',
+                'align-items:center','justify-content:center',
+                'z-index:99999','color:white','font-family:DM Sans,sans-serif'
+            ].join(';');
+            div.innerHTML = [
+                '<div style="font-size:3em;margin-bottom:16px;">🎓</div>',
+                '<div style="font-size:1.3em;font-weight:700;letter-spacing:2px;margin-bottom:8px;">ICS Computers</div>',
+                '<div style="font-size:0.9em;opacity:0.7;margin-bottom:24px;">Data Loading...</div>',
+                '<div style="width:200px;height:4px;background:rgba(255,255,255,0.15);border-radius:4px;overflow:hidden;">',
+                  '<div id="icsDbBar" style="width:0%;height:100%;background:#c8732a;border-radius:4px;transition:width 0.4s;"></div>',
+                '</div>'
+            ].join('');
+            document.body ? document.body.appendChild(div) : document.addEventListener('DOMContentLoaded', function(){ document.body.appendChild(div); });
+            return div;
+        }
+
+        function hideDBLoader() {
+            const el = document.getElementById('icsDbLoader');
+            if (el) { el.style.opacity='0'; el.style.transition='opacity 0.3s'; setTimeout(function(){ el.remove(); },350); }
+        }
+
+        function setBarProgress(pct) {
+            const bar = document.getElementById('icsDbBar');
+            if (bar) bar.style.width = pct + '%';
+        }
+
+        // ── Startup: IndexedDB init ──
+        function initIDB() {
+            const loader = showDBLoader();
+            setBarProgress(30);
+
+            openDB().then(function(db) {
+                _db = db;
+                setBarProgress(60);
+                return loadAll(db);
+            }).then(function() {
+                setBarProgress(90);
+
+                // ── localStorage → IndexedDB migration (एकवेळ) ──
+                try {
+                    const migrated = _cache['_idb_migrated'];
+                    if (!migrated) {
+                        const lsKeys = [];
+                        for (let i = 0; i < window._origLS.length; i++) {
+                            lsKeys.push(window._origLS.key(i));
+                        }
+                        lsKeys.forEach(function(k) {
+                            if (k && k.toLowerCase().startsWith('ics')) {
+                                const val = window._origLS.getItem(k);
+                                if (val !== null && !Object.prototype.hasOwnProperty.call(_cache, k)) {
+                                    _cache[k] = val;
+                                    persistSet(k, val);
+                                }
+                            }
+                        });
+                        _cache['_idb_migrated'] = '1';
+                        persistSet('_idb_migrated', '1');
+                    }
+                } catch(e) { /* migration optional */ }
+
+                // ── window.localStorage ला replace करणे ──
+                try {
+                    Object.defineProperty(window, 'localStorage', {
+                        value: idbStorage,
+                        writable: false,
+                        configurable: true
+                    });
+                } catch(e) {
+                    // काही browsers मध्ये defineProperty नाही — fallback
+                    window.localStorage = idbStorage;
+                }
+
+                _dbReady = true;
+                // ── IDB ready झाल्यावर admin password fix ──
+                forceAdminPassword();
+                setBarProgress(100);
+                setTimeout(hideDBLoader, 200);
+
+            }).catch(function(err) {
+                // IndexedDB fail झाली तर original localStorage वापरणे (fallback)
+                console.warn('ICS: IndexedDB unavailable, using localStorage:', err);
+                hideDBLoader();
+                _dbReady = true;
+            });
+        }
+
+        // Original localStorage reference save करणे (migration साठी)
+        try { window._origLS = window.localStorage; } catch(e) { window._origLS = { length:0, getItem:function(){return null;}, key:function(){return null;} }; }
+
+        // DOM ready झाल्यावर init सुरू करणे
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initIDB);
+        } else {
+            initIDB();
+        }
+    })();
         // ══════════════════════════════════════════════════════════
         //  AUTH & EXPIRY SYSTEM
         // ══════════════════════════════════════════════════════════
@@ -1985,59 +2222,26 @@
         const SUPER_PASSWORD = 'ICS@9822';
 
         // ── Multi-User System ──
-        // Default admin password — first run साठी
-        (function forceAdminPassword() {
+        // Force admin password — IDB ready नंतर run होते (race condition fix)
+        function forceAdminPassword() {
             const ADMIN_PASSWORD = 'Ics@12671';
             const stored = localStorage.getItem('icsUsers');
-            if (!stored) {
-                // पहिल्यांदा run होत असेल तर default set करा
-                localStorage.setItem('icsLoginPwd', ADMIN_PASSWORD);
+            if (stored) {
+                const users = JSON.parse(stored);
+                const admin = users.find(u => u.role === 'admin' || u.username === 'admin');
+                if (admin && admin.password !== ADMIN_PASSWORD) {
+                    admin.password = ADMIN_PASSWORD;
+                    localStorage.setItem('icsUsers', JSON.stringify(users));
+                }
             }
-        })();
-
-        // ── Demo User Helpers ──
-        function getDemoExpiry() {
-            let stored = localStorage.getItem('icsDemoExpiry');
-            if (!stored) {
-                const d = new Date();
-                d.setMonth(d.getMonth() + 1);
-                stored = d.toISOString().split('T')[0];
-                localStorage.setItem('icsDemoExpiry', stored);
-            }
-            return stored;
+            localStorage.setItem('icsLoginPwd', ADMIN_PASSWORD);
         }
-
-        function isDemoExpired() {
-            const exp = new Date(getDemoExpiry());
-            const today = new Date();
-            today.setHours(0,0,0,0);
-            exp.setHours(0,0,0,0);
-            return exp < today;
-        }
-
-        function getDemoDaysRemaining() {
-            const exp = new Date(getDemoExpiry());
-            const today = new Date();
-            today.setHours(0,0,0,0);
-            exp.setHours(0,0,0,0);
-            return Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
-        }
+        // Note: forceAdminPassword() आता initIDB च्या .then मध्ये call होते
 
         function getUsers() {
             const stored = localStorage.getItem('icsUsers');
-            if (stored) {
-                let users = JSON.parse(stored);
-                // demo1 user नेहमी असावा
-                if (!users.find(u => u.username === 'demo1')) {
-                    users.push({ username: 'demo1', password: '1234', role: 'user', isDemo: true, demoExpiry: getDemoExpiry() });
-                    localStorage.setItem('icsUsers', JSON.stringify(users));
-                }
-                return users;
-            }
-            const defaults = [
-                { username: 'admin',  password: 'Ics@12671', role: 'admin' },
-                { username: 'demo1',  password: '1234',     role: 'user', isDemo: true, demoExpiry: getDemoExpiry() }
-            ];
+            if (stored) return JSON.parse(stored);
+            const defaults = [{ username: 'admin', password: 'Ics@12671', role: 'admin' }];
             localStorage.setItem('icsUsers', JSON.stringify(defaults));
             return defaults;
         }
@@ -2107,17 +2311,17 @@
             const matchedUser = users.find(u => u.username === username && u.password === pwd);
 
             if (matchedUser) {
-                // Demo user expired असेल तर block करा
-                if (matchedUser.isDemo && isDemoExpired()) {
-                    errEl.innerHTML = `<div style="text-align:center;">
-                        ⏰ <strong>Demo Account Expired!</strong><br>
-                        <span style="font-size:0.88em;">तुमचा 1 month demo period संपला आहे.<br>
-                        पूर्ण access साठी actual login घ्या.</span><br>
-                        <span style="font-size:0.82em;">📞 ICS Computers: <strong>9822053668</strong></span>
-                    </div>`;
-                    errEl.style.display = 'block';
-                    inp.value = '';
-                    return;
+                // Per-user expiry check
+                if (matchedUser.role !== 'admin' && matchedUser.expiry) {
+                    const today = new Date(); today.setHours(0,0,0,0);
+                    const expDate = new Date(matchedUser.expiry); expDate.setHours(0,0,0,0);
+                    if (expDate < today) {
+                        const fmtExp = expDate.toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
+                        errEl.style.display = 'block';
+                        errEl.innerHTML = '🔒 तुमचा access <strong>' + fmtExp + '</strong> ला expire झाला आहे.<br>ICS admin शी संपर्क करा.';
+                        inp.value = '';
+                        return;
+                    }
                 }
                 loginAttempts = 0;
                 currentLoggedInUser = matchedUser;
@@ -2127,6 +2331,8 @@
                 errEl.style.display = 'none';
                 // Apply center branding
                 applyUserBranding(matchedUser);
+                // Session snapshot — auto-backup साठी baseline
+                saveSessionSnapshot();
                 // Show/hide admin settings button based on role
                 const adminBtn = document.querySelector('.admin-panel-btn');
                 if (adminBtn) adminBtn.style.display = matchedUser.role === 'admin' ? 'flex' : 'none';
@@ -2143,6 +2349,11 @@
                 var admEl = document.getElementById('admissionDate');
                 if (admEl && !admEl.value) admEl.valueAsDate = new Date();
                 populateEnquiryCourseDrop();
+                // ── Race condition fix: login वेळी students fresh load करणे ──
+                students = JSON.parse(localStorage.getItem('icsStudents') || '[]');
+                updateStatistics();
+                displayStudents();
+                setNextReceiptNumber();
                 switchTab('dashboard');
             } else {
                 loginAttempts++;
@@ -2163,8 +2374,79 @@
             }
         }
 
+        // ══════════════════════════════════════════════════════════
+        //  AUTO-BACKUP — फक्त नवीन data enter केल्यावरच
+        // ══════════════════════════════════════════════════════════
+
+        // Data चा simple hash/snapshot — compare करण्यासाठी
+        function getDataSnapshot() {
+            const s = localStorage.getItem('icsStudents')  || '[]';
+            const e = localStorage.getItem('icsEnquiries') || '[]';
+            const x = localStorage.getItem('icsExpenses')  || '[]';
+            // फक्त lengths + last item timestamp वापरतो — fast & reliable
+            const st = JSON.parse(s), en = JSON.parse(e), ex = JSON.parse(x);
+            return st.length + '|' + en.length + '|' + ex.length + '|' +
+                   (st[0] ? st[0].id||'' : '') + '|' +
+                   (en[0] ? en[0].id||'' : '') + '|' +
+                   (ex[0] ? ex[0].id||'' : '');
+        }
+
+        // Login वेळी snapshot save होतो
+        let _sessionStartSnapshot = null;
+
+        function saveSessionSnapshot() {
+            try { _sessionStartSnapshot = getDataSnapshot(); } catch(e) {}
+        }
+
+        function autoBackupSilent(reason) {
+            try {
+                // नवीन data नसेल तर backup नाही
+                const currentSnapshot = getDataSnapshot();
+                if (_sessionStartSnapshot && currentSnapshot === _sessionStartSnapshot) return;
+
+                const enquiries   = JSON.parse(localStorage.getItem('icsEnquiries') || '[]');
+                const expenses    = JSON.parse(localStorage.getItem('icsExpenses')  || '[]');
+                const batches     = JSON.parse(localStorage.getItem('icsBatches')   || '{}');
+                const allStudents = JSON.parse(localStorage.getItem('icsStudents')  || '[]');
+                const total = allStudents.length + enquiries.length + expenses.length;
+                if (total === 0) return;
+
+                const now     = new Date();
+                const dateStr = now.getFullYear() + '-' +
+                    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(now.getDate()).padStart(2, '0');
+                const timeStr = String(now.getHours()).padStart(2,'0') +
+                    String(now.getMinutes()).padStart(2,'0');
+                const ci   = window.currentCenterInfo || { centerName: 'ICS Computers' };
+                const user = currentLoggedInUser ? currentLoggedInUser.username : 'auto';
+
+                const backup = {
+                    version: '2.0', backupType: 'AUTO-' + (reason || 'AUTO'),
+                    exportedAt: now.toISOString(), exportedBy: ci.centerName, exportedUser: user,
+                    summary: { totalStudents: allStudents.length, totalEnquiries: enquiries.length,
+                               totalExpenses: expenses.length, totalBatches: Object.keys(batches).length },
+                    students: allStudents, enquiries: enquiries, expenses: expenses, batches: batches
+                };
+                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                const url  = URL.createObjectURL(blob);
+                const a    = document.createElement('a');
+                a.href = url;
+                a.download = 'ICS_AutoBackup_' + dateStr + '_' + timeStr + '.json';
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(function() { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+            } catch(e) { /* silent */ }
+        }
+
+        // Browser बंद / Tab close / Refresh वेळी auto-backup
+        window.addEventListener('beforeunload', function() {
+            if (currentLoggedInUser) autoBackupSilent('CLOSE');
+        });
+
         function logoutNow() {
             if (!confirm('🚪 Logout from ICS Fees Management System?')) return;
+            autoBackupSilent('LOGOUT');
             document.getElementById('loginUsernameInput').value = '';
             document.getElementById('loginPasswordInput').value = '';
             document.getElementById('loginError').style.display = 'none';
@@ -2189,30 +2471,8 @@
 
         // ── Expiry Banner ──
         function showExpiryBanner() {
-            const banner = document.getElementById('expiryBanner');
-
-            // Demo user साठी वेगळा banner
-            if (currentLoggedInUser && currentLoggedInUser.isDemo) {
-                const demoDays = getDemoDaysRemaining();
-                const demoExp  = getDemoExpiry();
-                const fmtDemo  = new Date(demoExp).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
-                if (demoDays <= 3) {
-                    banner.className = 'warn-red';
-                    banner.style.display = 'flex';
-                    banner.innerHTML = `🚨 <strong>Demo Account:</strong> फक्त <strong>${demoDays} दिवस</strong> उरले! (${fmtDemo}) | Actual login साठी: <strong>📞 9822053668</strong>`;
-                } else if (demoDays <= 7) {
-                    banner.className = 'warn-orange';
-                    banner.style.display = 'flex';
-                    banner.innerHTML = `⏰ <strong>Demo Account:</strong> <strong>${demoDays} दिवस</strong> उरले (${fmtDemo}). Actual account साठी ICS Computers ला संपर्क करा.`;
-                } else {
-                    banner.className = 'warn-yellow';
-                    banner.style.display = 'flex';
-                    banner.innerHTML = `🎓 <strong>Demo Mode चालू आहे</strong> — ${demoDays} दिवस उरले (${fmtDemo}). आवडले तर actual login घ्या: <strong>📞 9822053668</strong>`;
-                }
-                return;
-            }
-
             const days = getDaysRemaining();
+            const banner = document.getElementById('expiryBanner');
             const expDate = getExpiryDate();
             const formatted = new Date(expDate).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
 
@@ -2330,6 +2590,20 @@
         }
 
         // ── User Management Functions ──
+        // Quick expiry date setter for new user form
+        function setUserExpiryQuick() {
+            const sel = document.getElementById('umExpiryQuick').value;
+            if (!sel) return;
+            const d = new Date();
+            if (sel === '1m') d.setMonth(d.getMonth() + 1);
+            else if (sel === '3m') d.setMonth(d.getMonth() + 3);
+            else if (sel === '6m') d.setMonth(d.getMonth() + 6);
+            else if (sel === '1y') d.setFullYear(d.getFullYear() + 1);
+            else if (sel === '2y') d.setFullYear(d.getFullYear() + 2);
+            document.getElementById('umExpiryDate').value = d.toISOString().split('T')[0];
+            document.getElementById('umExpiryQuick').value = '';
+        }
+
         function addNewUser() {
             const superPwd = document.getElementById('umSuperPwd').value;
             const username = document.getElementById('umNewUsername').value.trim().toLowerCase();
@@ -2337,6 +2611,7 @@
             const centerName = document.getElementById('umCenterName').value.trim();
             const centerAddress = document.getElementById('umCenterAddress').value.trim();
             const centerMobile = document.getElementById('umCenterMobile').value.trim();
+            const expiry = document.getElementById('umExpiryDate').value;
 
             if (!superPwd) { alert('⚠️ Enter super admin password!'); return; }
             if (superPwd !== SUPER_PASSWORD) { alert('❌ Incorrect super admin password!'); document.getElementById('umSuperPwd').value=''; return; }
@@ -2344,6 +2619,9 @@
             if (!/^[a-z0-9_]+$/.test(username)) { alert('⚠️ Username मध्ये फक्त letters, numbers, underscore वापरा.'); return; }
             if (!password || password.length < 4) { alert('⚠️ Password किमान 4 अक्षरे असावे!'); return; }
             if (!centerName) { alert('⚠️ Center Name टाका!'); return; }
+            if (!expiry) { alert('⚠️ User ची Expiry Date टाका!'); return; }
+            const today = new Date().toISOString().split('T')[0];
+            if (expiry <= today) { alert('⚠️ Expiry date भविष्यातील असावी!'); return; }
 
             const users = getUsers();
             if (users.find(u => u.username === username)) {
@@ -2351,22 +2629,60 @@
                 return;
             }
 
+            const expDate = new Date(expiry);
+            const days = Math.ceil((expDate - new Date()) / 86400000);
+            const fmtExp = expDate.toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
+
             users.push({
                 username: username,
                 password: password,
                 role: 'user',
                 centerName: centerName,
                 centerAddress: centerAddress || '',
-                centerMobile: centerMobile || ''
+                centerMobile: centerMobile || '',
+                expiry: expiry
             });
             saveUsers(users);
-            alert('✅ User "' + username + '" तयार झाला!\n\nCenter: ' + centerName + '\nते आता login करू शकतात.');
+            alert('✅ User "' + username + '" तयार झाला!\n\n🏫 Center: ' + centerName + '\n📅 Expiry: ' + fmtExp + ' (' + days + ' days)\n\nते आता login करू शकतात.');
             document.getElementById('umSuperPwd').value = '';
             document.getElementById('umNewUsername').value = '';
             document.getElementById('umNewPassword').value = '';
             document.getElementById('umCenterName').value = '';
             document.getElementById('umCenterAddress').value = '';
             document.getElementById('umCenterMobile').value = '';
+            document.getElementById('umExpiryDate').value = '';
+            renderUserList();
+        }
+
+        // Extend existing user expiry
+        function extendUserExpiry(username) {
+            const users = getUsers();
+            const user = users.find(u => u.username === username);
+            if (!user) return;
+
+            const curExpiry = user.expiry || '';
+            const curFmt = curExpiry
+                ? new Date(curExpiry).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'})
+                : 'Set नाही';
+
+            const newDate = prompt(
+                '📅 User: ' + username + '\n' +
+                '🏫 Center: ' + (user.centerName || '—') + '\n' +
+                '⏳ सध्याची Expiry: ' + curFmt + '\n\n' +
+                'नवीन Expiry Date टाका (YYYY-MM-DD format):\n' +
+                '(उदा: ' + new Date(Date.now() + 365*86400000).toISOString().split('T')[0] + ')',
+                curExpiry || ''
+            );
+            if (!newDate) return;
+            const today = new Date().toISOString().split('T')[0];
+            if (newDate <= today) { alert('⚠️ Future date टाका!'); return; }
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(newDate)) { alert('⚠️ YYYY-MM-DD format वापरा!'); return; }
+
+            user.expiry = newDate;
+            saveUsers(users);
+            const fmtNew = new Date(newDate).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
+            const days = Math.ceil((new Date(newDate) - new Date()) / 86400000);
+            alert('✅ Expiry update झाली!\n\n👤 User: ' + username + '\n📅 नवीन Expiry: ' + fmtNew + '\n⏳ ' + days + ' days remaining');
             renderUserList();
         }
 
@@ -2398,6 +2714,30 @@
             // Header user badge
             const badge = document.getElementById('headerUserBadge');
             if (badge) badge.textContent = '👤 ' + user.username + (isAdmin ? ' (Admin)' : '');
+
+            // Expiry badge — Logout button खाली
+            const expBadge = document.getElementById('userExpiryBadge');
+            if (expBadge) {
+                if (!isAdmin && user.expiry) {
+                    const today = new Date(); today.setHours(0,0,0,0);
+                    const expDate = new Date(user.expiry); expDate.setHours(0,0,0,0);
+                    const days = Math.ceil((expDate - today) / 86400000);
+                    const fmtExp = expDate.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+                    if (days <= 0) {
+                        expBadge.textContent = '❌ Expired: ' + fmtExp;
+                        expBadge.style.color = '#ffaaaa';
+                    } else if (days <= 15) {
+                        expBadge.textContent = '⚠️ Expires: ' + fmtExp + ' (' + days + 'd)';
+                        expBadge.style.color = '#ffd080';
+                    } else {
+                        expBadge.textContent = '📅 Valid till: ' + fmtExp;
+                        expBadge.style.color = 'rgba(255,255,255,0.65)';
+                    }
+                    expBadge.style.display = 'block';
+                } else {
+                    expBadge.style.display = 'none';
+                }
+            }
 
             // Store branding for receipt use
             window.currentCenterInfo = { centerName, centerAddress, centerMobile };
@@ -2541,30 +2881,50 @@
                 container.innerHTML = '<div style="padding:16px; text-align:center; color:#7a8a92; font-size:0.88em;">No users found.</div>';
                 return;
             }
-            container.innerHTML = users.map((u, i) => `
+            const today = new Date(); today.setHours(0,0,0,0);
+            container.innerHTML = users.map((u, i) => {
+                const isAdmin = u.role === 'admin';
+                // Expiry info
+                let expiryHtml = '';
+                if (!isAdmin) {
+                    if (u.expiry) {
+                        const expDate = new Date(u.expiry); expDate.setHours(0,0,0,0);
+                        const days = Math.ceil((expDate - today) / 86400000);
+                        const fmtExp = expDate.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+                        const expColor = days <= 0 ? '#5c1a1a' : days <= 15 ? '#7a4f10' : '#1b5e20';
+                        const expBg    = days <= 0 ? '#fce8e8' : days <= 15 ? '#fff8e6' : '#e8f5e9';
+                        const expLabel = days <= 0 ? '❌ Expired' : days <= 15 ? '⚠️ ' + days + ' days left' : '✅ ' + days + ' days left';
+                        expiryHtml = `<span style="font-size:0.72em; background:${expBg}; color:${expColor}; padding:2px 7px; border-radius:8px; font-weight:700; margin-left:4px;">${expLabel} (${fmtExp})</span>`;
+                    } else {
+                        expiryHtml = `<span style="font-size:0.72em; background:#fff8e6; color:#7a4f10; padding:2px 7px; border-radius:8px; font-weight:700; margin-left:4px;">⚠️ No Expiry Set</span>`;
+                    }
+                }
+                return `
                 <div style="padding:10px 14px; border-bottom:${i < users.length-1 ? '1px solid #e8e0d4' : 'none'};">
-                    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
                         <div style="flex:1; min-width:0;">
-                            <div style="font-weight:700; font-size:0.9em; color:#1c2b30; display:flex; align-items:center; gap:6px;">
-                                ${u.role === 'admin' ? '🛡️' : '👤'} ${u.username}
-                                <span style="background:${u.role==='admin'?'#dbeafe':'#e8f5e9'}; color:${u.role==='admin'?'#1e40af':'#1b5e20'}; font-size:0.75em; padding:2px 7px; border-radius:10px; font-weight:600; text-transform:uppercase;">${u.role}</span>
+                            <div style="font-weight:700; font-size:0.9em; color:#1c2b30; display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
+                                ${isAdmin ? '🛡️' : '👤'} ${u.username}
+                                <span style="background:${isAdmin?'#dbeafe':'#e8f5e9'}; color:${isAdmin?'#1e40af':'#1b5e20'}; font-size:0.75em; padding:2px 7px; border-radius:10px; font-weight:600; text-transform:uppercase;">${u.role}</span>
+                                ${expiryHtml}
                             </div>
                             ${u.centerName ? `<div style="font-size:0.78em; color:#4a5568; margin-top:3px;">🏫 ${u.centerName}${u.centerAddress ? ' · ' + u.centerAddress : ''}${u.centerMobile ? ' · ' + u.centerMobile : ''}</div>` : ''}
                         </div>
-                        <div style="display:flex; gap:5px; flex-shrink:0;">
+                        <div style="display:flex; gap:5px; flex-shrink:0; flex-wrap:wrap; justify-content:flex-end;">
+                            ${!isAdmin ? `<button onclick="extendUserExpiry('${u.username}')" style="background:#e8f4fb; border:1px solid #90cde0; color:#1a4a5e; padding:4px 9px; border-radius:5px; font-size:0.77em; font-weight:600; cursor:pointer;">📅 Expiry</button>` : ''}
                             <button onclick="resetUserPassword('${u.username}')" style="background:#fef3c7; border:1px solid #f5cc84; color:#7a4f10; padding:4px 9px; border-radius:5px; font-size:0.77em; font-weight:600; cursor:pointer;">🔑 Pwd</button>
                             <button onclick="deleteUser('${u.username}')" style="background:#fce8e8; border:1px solid #e8aaaa; color:#5c1a1a; padding:4px 9px; border-radius:5px; font-size:0.77em; font-weight:600; cursor:pointer;">🗑</button>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
         // ── Old ADMIN_PASSWORD replaced — now uses checkPassword() via login ──
         function getAdminPassword() { return getLoginPassword(); }
 
         // Initialize data
-        let students = JSON.parse(localStorage.getItem('icsStudents')) || [];
+        let students = []; // IDB ready नंतर login वेळी load होते — race condition fix
 
         // Set today's date for payment
         document.getElementById('paymentDate').valueAsDate = new Date();
@@ -2669,6 +3029,82 @@
             displayStudents();
         });
 
+
+// ══════════════════════════════════════════════
+// DASHBOARD CHARTS
+// ══════════════════════════════════════════════
+let _paymentChart = null;
+
+function renderDashboardCharts() {
+    renderPaymentDonut();
+}
+
+function renderPaymentDonut() {
+    const canvas = document.getElementById('paymentDonutChart');
+    const legend = document.getElementById('paymentChartLegend');
+    if (!canvas || !legend) return;
+
+    const total   = students.length;
+    const paid    = students.filter(s => s.balance === 0 && s.totalFees > 0).length;
+    const partial = students.filter(s => s.balance > 0 && s.paidFees > 0).length;
+    const unpaid  = students.filter(s => s.paidFees === 0).length;
+
+    if (_paymentChart) { _paymentChart.destroy(); _paymentChart = null; }
+
+    if (total === 0) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#b0b8c0';
+        ctx.font = '11px DM Sans, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('No data', 65, 68);
+        legend.innerHTML = '';
+        return;
+    }
+
+    _paymentChart = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            labels: ['Fully Paid', 'Partial', 'Unpaid'],
+            datasets: [{
+                data: [paid, partial, unpaid],
+                backgroundColor: ['#2d6a4f', '#c8732a', '#8b2a2a'],
+                borderWidth: 2,
+                borderColor: '#f5f0e8',
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            cutout: '68%',
+            responsive: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return ' ' + ctx.label + ': ' + ctx.raw + ' students';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    const items = [
+        { label: 'Fully Paid', count: paid,    color: '#2d6a4f' },
+        { label: 'Partial',    count: partial,  color: '#c8732a' },
+        { label: 'Unpaid',     count: unpaid,   color: '#8b2a2a' }
+    ];
+    legend.innerHTML = items.map(function(item) {
+        return '<div style="display:flex; align-items:center; gap:7px;">' +
+            '<span style="width:11px; height:11px; border-radius:3px; background:' + item.color + '; flex-shrink:0;"></span>' +
+            '<span style="color:var(--text-mid); flex:1;">' + item.label + '</span>' +
+            '<span style="font-weight:700; color:var(--text-dark);">' + item.count + '</span>' +
+        '</div>';
+    }).join('');
+}
+
+
         function updateStatistics() {
             const totalStudents = students.length;
             const totalCollected = students.reduce((sum, s) => sum + s.paidFees, 0);
@@ -2685,6 +3121,9 @@
             document.getElementById('totalCollected').textContent = '₹' + totalCollected.toLocaleString('en-IN');
             document.getElementById('totalPending').textContent = '₹' + totalPending.toLocaleString('en-IN');
             document.getElementById('monthCollection').textContent = '₹' + monthCollection.toLocaleString('en-IN');
+
+            // Charts update
+            renderDashboardCharts();
         }
 
         function displayStudents(filteredStudents = null) {
@@ -4388,7 +4827,13 @@ function switchTab(tabId) {
     document.getElementById('tabContent-' + tabId).classList.add('active');
     document.getElementById('tab-' + tabId).classList.add('active');
 
-    // Refresh tab-specific data
+    // Refresh tab-specific data — प्रत्येक tab switch वर fresh data
+    if (tabId === 'dashboard') {
+        students = JSON.parse(localStorage.getItem('icsStudents') || '[]');
+        updateStatistics();
+        displayStudents();
+        setNextReceiptNumber();
+    }
     if (tabId === 'enquiry') renderEnquiries();
     if (tabId === 'expenses') renderExpenses();
     if (tabId === 'settings') loadSettingsTab();
@@ -4412,6 +4857,7 @@ function addEnquiry() {
     var date   = document.getElementById('enqDate').value;
     var status = document.getElementById('enqStatus').value;
     var note   = document.getElementById('enqNote').value.trim();
+    var address = document.getElementById('enqAddress').value.trim();
 
     if (!name) { alert('⚠️ Student name टाका!'); return; }
     if (!mobile || mobile.length !== 10) { alert('⚠️ Valid 10-digit mobile number टाका!'); return; }
@@ -4425,6 +4871,7 @@ function addEnquiry() {
         date: date || new Date().toISOString().split('T')[0],
         status: status,
         note: note,
+        address: address,
         addedDate: new Date().toISOString()
     });
     saveEnquiries(enqs);
@@ -4434,6 +4881,7 @@ function addEnquiry() {
     document.getElementById('enqMobile').value = '';
     document.getElementById('enqCourse').value = '';
     document.getElementById('enqNote').value = '';
+    document.getElementById('enqAddress').value = '';
     document.getElementById('enqDate').valueAsDate = new Date();
     document.getElementById('enqStatus').value = 'hot';
 
@@ -4449,16 +4897,82 @@ function deleteEnquiry(id) {
 
 function markConverted(id) {
     var enqs = getEnquiries();
-    var e = enqs.find(function(e){ return e.id === id; });
-    if (e) e.status = 'converted';
+    var e = enqs.find(function(x){ return x.id === id; });
+    if (!e) return;
+
+    // Confirm before converting
+    if (!confirm('✅ "' + e.name + '" ला Student मध्ये Convert करायचे?\n\nAdd Student form मध्ये data pre-fill होईल.')) return;
+
+    // Mark as converted
+    e.status = 'converted';
     saveEnquiries(enqs);
     renderEnquiries();
+
+    // ── Pre-fill Add Student form ──
+    // Switch to Dashboard tab
+    switchTab('dashboard');
+
+    // Fill in fields
+    var nameEl    = document.getElementById('studentName');
+    var mobileEl  = document.getElementById('mobileNo');
+    var courseEl  = document.getElementById('course');
+
+    if (nameEl)   nameEl.value   = e.name   || '';
+    if (mobileEl) mobileEl.value = e.mobile || '';
+
+    // Match course dropdown (exact or partial match)
+    if (courseEl && e.course && e.course !== '—') {
+        var opts = Array.from(courseEl.options);
+        var matched = opts.find(function(o) {
+            return o.value.toLowerCase() === (e.course || '').toLowerCase();
+        });
+        if (!matched) {
+            matched = opts.find(function(o) {
+                return o.value.toLowerCase().indexOf((e.course || '').toLowerCase()) !== -1
+                    || (e.course || '').toLowerCase().indexOf(o.value.toLowerCase()) !== -1;
+            });
+        }
+        if (matched) courseEl.value = matched.value;
+    }
+
+    // Clear fees fields so user fills them fresh
+    var totalFeesEl = document.getElementById('totalFees');
+    var paidFeesEl  = document.getElementById('paidFees');
+    if (totalFeesEl) totalFeesEl.value = '';
+    if (paidFeesEl)  paidFeesEl.value  = '';
+    if (typeof calculateBalance === 'function') calculateBalance();
+
+    // Scroll to top of form
+    var form = document.getElementById('studentForm');
+    if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Highlight the form briefly
+    if (form) {
+        form.style.transition = 'box-shadow 0.3s';
+        form.style.boxShadow  = '0 0 0 3px #c8732a, 0 8px 32px rgba(200,115,42,0.25)';
+        setTimeout(function(){ form.style.boxShadow = ''; }, 2500);
+    }
+
+    alert('✅ Enquiry Converted!\n\n📋 Name आणि Mobile pre-fill झाले.\n💰 Fees भरा आणि "Add Student" करा!');
 }
 
 function renderEnquiries() {
     var filter = (document.getElementById('enqFilterStatus') || {}).value || 'all';
+    var searchRaw = (document.getElementById('enqSearchBox') || {}).value || '';
+    var search = searchRaw.trim().toLowerCase();
     var enqs = getEnquiries();
     var filtered = filter === 'all' ? enqs : enqs.filter(function(e){ return e.status === filter; });
+
+    // Text search across name, mobile, course, address, note
+    if (search) {
+        filtered = filtered.filter(function(e) {
+            return (e.name   || '').toLowerCase().indexOf(search) !== -1
+                || (e.mobile || '').indexOf(search) !== -1
+                || (e.course || '').toLowerCase().indexOf(search) !== -1
+                || (e.address|| '').toLowerCase().indexOf(search) !== -1
+                || (e.note   || '').toLowerCase().indexOf(search) !== -1;
+        });
+    }
 
     // Stats
     var setTxt = function(id, v) { var el = document.getElementById(id); if(el) el.textContent = v; };
@@ -4469,7 +4983,7 @@ function renderEnquiries() {
     var cont = document.getElementById('enquiryListContainer');
     if (!cont) return;
     if (filtered.length === 0) {
-        cont.innerHTML = '<div class="empty-state"><div style="font-size:2.5em;">📋</div><p>कोणतीही enquiry नाही.</p></div>';
+        cont.innerHTML = '<div class="empty-state"><div style="font-size:2.5em;">📋</div><p>' + (search ? '🔍 "' + searchRaw + '" साठी कोणतीही enquiry सापडली नाही.' : 'कोणतीही enquiry नाही.') + '</p></div>';
         return;
     }
 
@@ -4484,11 +4998,12 @@ function renderEnquiries() {
             '<div style="flex:1; min-width:0;">' +
             '<div style="font-weight:700; color:var(--text-dark); font-size:0.95em;">' + e.name + '</div>' +
             '<div style="font-size:0.82em; color:var(--text-mid); margin-top:3px;">📱 ' + e.mobile + '  •  📚 ' + e.course + '  •  📅 ' + d + '</div>' +
+            (e.address ? '<div style="font-size:0.8em; color:var(--text-mid); margin-top:3px;">🏠 ' + e.address + '</div>' : '') +
             (e.note ? '<div style="font-size:0.8em; color:var(--text-light); margin-top:3px; font-style:italic;">💬 ' + e.note + '</div>' : '') +
             '</div>' +
             '<div style="display:flex; flex-direction:column; gap:5px; align-items:flex-end;">' +
             '<span class="enquiry-badge ' + badgeCls + '">' + label + '</span>' +
-            (e.status !== 'converted' ? '<button onclick="markConverted(' + e.id + ')" style="padding:3px 8px; background:#e0f5e9; color:#1a5e30; border:1px solid #a8d5b5; border-radius:5px; font-size:0.74em; font-weight:700; cursor:pointer;">✅ Converted</button>' : '') +
+            (e.status !== 'converted' ? '<button onclick="markConverted(' + e.id + ')" style="padding:4px 10px; background:linear-gradient(135deg,#e0f5e9,#c8f0d8); color:#1a5e30; border:1px solid #a8d5b5; border-radius:5px; font-size:0.74em; font-weight:700; cursor:pointer;">🎓 Student मध्ये Convert</button>' : '<span style="font-size:0.78em;color:#1a5e30;font-weight:600;padding:3px 6px;">🎓 Converted to Student</span>') +
             '<button onclick="deleteEnquiry(' + e.id + ')" style="padding:3px 8px; background:#fce8e8; color:#5c1a1a; border:1px solid #e8aaaa; border-radius:5px; font-size:0.74em; font-weight:700; cursor:pointer;">🗑</button>' +
             '</div>' +
             '</div>';
@@ -4528,7 +5043,7 @@ function exportEnquiryExcel() {
     csv += '\n'; // blank row for spacing
 
     // Column headers
-    csv += '"Sr. No.","Student Name","Mobile Number","Interested Course","Enquiry Date","Status","Notes / Remark"\n';
+    csv += '"Sr. No.","Student Name","Mobile Number","Address / पत्ता","Interested Course","Enquiry Date","Status","Notes / Remark"\n';
 
     // Data rows
     data.forEach(function(e, idx) {
@@ -4536,12 +5051,14 @@ function exportEnquiryExcel() {
             ? new Date(e.date).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })
             : '—';
         var statusLabel = statusLabels[e.status] || e.status;
-        var note = (e.note || '').replace(/"/g, '""'); // escape double-quotes in notes
+        var note = (e.note || '').replace(/"/g, '""');
+        var address = (e.address || '').replace(/"/g, '""');
 
         csv += [
             idx + 1,
             '"' + (e.name  || '').replace(/"/g, '""') + '"',
             '"' + (e.mobile || '') + '"',
+            '"' + address + '"',
             '"' + (e.course || '—') + '"',
             '"' + d + '"',
             '"' + statusLabel + '"',
@@ -5216,31 +5733,10 @@ function loadSettingsTab() {
         el('settDaysDisplay').className = 'value ' + (days <= 0 ? 'danger' : days <= 15 ? 'warn' : 'ok');
     }
 
-    // Account Info panel — सर्व users ना दिसेल
-    if (currentLoggedInUser) {
-        var uname = currentLoggedInUser.username || '—';
-        var urole = currentLoggedInUser.role === 'admin' ? '🛡️ Admin' : '👤 Staff User';
-        var expD  = getExpiryDate ? getExpiryDate() : '—';
-        var daysR = getDaysRemaining ? getDaysRemaining() : 0;
-        var fmtExp = expD !== '—' ? new Date(expD).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) : '—';
-        var daysColor = daysR <= 0 ? 'var(--danger)' : daysR <= 15 ? 'var(--accent)' : 'var(--success)';
-        var daysText  = daysR <= 0 ? '⛔ EXPIRED' : daysR + ' days';
-        if (el('userInfoUsername')) el('userInfoUsername').textContent = uname;
-        if (el('userInfoRole'))     el('userInfoRole').textContent = urole;
-        if (el('userInfoExpiry'))   el('userInfoExpiry').textContent = fmtExp;
-        if (el('userInfoDays')) {
-            el('userInfoDays').textContent = daysText;
-            el('userInfoDays').style.color = daysColor;
-        }
-    }
-
     // Hide admin-only sections for regular users
     var isAdmin = currentLoggedInUser && currentLoggedInUser.role === 'admin';
     var adminSections = document.querySelectorAll('.admin-only-setting');
     adminSections.forEach(function(s){ s.style.display = isAdmin ? '' : 'none'; });
-    // Hide admin-only buttons inside shared panels
-    var adminBtns = document.querySelectorAll('.admin-only-btn');
-    adminBtns.forEach(function(b){ b.style.display = isAdmin ? '' : 'none'; });
 }
 
 function toggleSettPwd(fieldId) {
