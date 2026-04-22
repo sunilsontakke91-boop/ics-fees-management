@@ -729,6 +729,173 @@
         #qaDropInner::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius:8px; }
         #qaDropInner::-webkit-scrollbar-thumb { background: var(--accent); border-radius:8px; }
 
+                /* ── STATUS FILTER BUTTONS ── */
+        .status-filter-btn {
+            padding: 7px 16px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.84em;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-panel);
+            color: var(--text-mid);
+            transition: all 0.18s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+        .status-filter-btn.active-filter {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 3px 10px rgba(30,77,94,0.3);
+        }
+        #filterBtn-paid.active-filter   { background: linear-gradient(135deg, #2d6a4f, #40916c); border-color:#2d6a4f; box-shadow:0 3px 10px rgba(45,106,79,0.3); }
+        #filterBtn-partial.active-filter { background: linear-gradient(135deg, #b87c1a, #d4a843); border-color:#b87c1a; box-shadow:0 3px 10px rgba(184,124,26,0.3); }
+        #filterBtn-pending.active-filter { background: linear-gradient(135deg, #8b2a2a, #b03a3a); border-color:#8b2a2a; box-shadow:0 3px 10px rgba(139,42,42,0.3); }
+        .filter-count {
+            background: rgba(255,255,255,0.25);
+            border-radius: 10px;
+            padding: 1px 7px;
+            font-size: 0.85em;
+            font-weight: 700;
+        }
+        .status-filter-btn:not(.active-filter) .filter-count {
+            background: rgba(0,0,0,0.08);
+            color: var(--text-mid);
+        }
+
+                /* ── SETTINGS CARDS ── */
+        .sett-card {
+            background: var(--bg-panel);
+            border-radius: 14px;
+            padding: 20px 16px 16px;
+            border: 1.5px solid rgba(255,255,255,0.7);
+            box-shadow: 0 4px 18px var(--shadow);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.22s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+        }
+        .sett-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 28px rgba(10,30,40,0.22);
+            border-color: var(--accent);
+        }
+        .sett-card.active-scard {
+            border-color: var(--accent);
+            box-shadow: 0 6px 24px rgba(200,115,42,0.25);
+            background: linear-gradient(160deg, #fffdf8, #fef5e8);
+        }
+        .sett-card-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            margin-bottom: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+        }
+        .sett-card-title {
+            font-weight: 700;
+            font-size: 0.88em;
+            color: var(--text-dark);
+            letter-spacing: 0.2px;
+        }
+        .sett-card-sub {
+            font-size: 0.73em;
+            color: var(--text-light);
+            line-height: 1.3;
+        }
+        .sett-card-arrow {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-size: 0.72em;
+            color: var(--text-light);
+            transition: transform 0.22s;
+        }
+        .sett-card.active-scard .sett-card-arrow {
+            transform: rotate(180deg);
+            color: var(--accent);
+        }
+
+        /* ── SETTINGS PANEL (expandable) ── */
+        .sett-panel {
+            display: none;
+            background: var(--bg-panel);
+            border-radius: 14px;
+            padding: 22px 24px 24px;
+            border: 1.5px solid var(--accent);
+            box-shadow: 0 8px 28px rgba(200,115,42,0.12);
+            margin-bottom: 14px;
+            animation: settPanelIn 0.22s ease;
+        }
+        .sett-panel.open { display: block; }
+        @keyframes settPanelIn {
+            from { opacity:0; transform:translateY(-8px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .sett-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.05em;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+        .sett-panel-close {
+            background: linear-gradient(135deg,#8b2a2a,#b03a3a);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sett-panel-close:hover { transform: rotate(90deg); filter: brightness(1.1); }
+
+        /* ── SETTINGS ACTION BUTTONS ── */
+        .sett-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 14px;
+            border: none;
+            border-radius: 9px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            color: white;
+            background: linear-gradient(135deg, var(--sab-c1), var(--sab-c2));
+            border-left: 3px solid var(--sab-bdr);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: all 0.18s;
+        }
+        .sett-action-btn:hover { transform: translateY(-2px); filter: brightness(1.08); box-shadow: 0 4px 14px rgba(0,0,0,0.22); }
+        .sab-icon { font-size: 1.1em; }
+
                 .login-attempts {
             font-size: 0.82em;
             color: var(--accent);
@@ -1225,11 +1392,32 @@
 
         </div>
 
-        <!-- Search and Filter -->
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="🔍 Search by name, mobile, or course...">
-            <button class="btn btn-primary" onclick="searchStudents()">Search</button>
-            <button class="btn btn-info" onclick="showAllStudents()">Show All</button>
+        <!-- Filter + Inline Search -->
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+            <button id="filterBtn-all" class="status-filter-btn active-filter" onclick="filterByStatus('all')">
+                🎓 All <span id="filterCount-all" class="filter-count"></span>
+            </button>
+            <button id="filterBtn-paid" class="status-filter-btn" onclick="filterByStatus('paid')">
+                ✅ Paid <span id="filterCount-paid" class="filter-count"></span>
+            </button>
+            <button id="filterBtn-partial" class="status-filter-btn" onclick="filterByStatus('partial')">
+                🟡 Partial <span id="filterCount-partial" class="filter-count"></span>
+            </button>
+            <button id="filterBtn-pending" class="status-filter-btn" onclick="filterByStatus('pending')">
+                🔴 Pending <span id="filterCount-pending" class="filter-count"></span>
+            </button>
+
+            <!-- Inline Search Box -->
+            <div style="margin-left:auto; display:flex; align-items:center; background:var(--bg-panel); border:1.5px solid var(--border); border-radius:20px; padding:4px 12px; gap:6px; transition:border-color 0.2s; min-width:200px;"
+                 onfocusin="this.style.borderColor='var(--primary)'" onfocusout="this.style.borderColor='var(--border)'">
+                <span style="color:var(--text-light); font-size:0.9em;">🔍</span>
+                <input type="text" id="searchInput"
+                    placeholder="Search name, mobile, course..."
+                    oninput="applyFilterAndSearch()"
+                    style="border:none; outline:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:0.84em; color:var(--text-dark); width:100%;">
+                <button onclick="clearSearch()" title="Clear"
+                    style="border:none; background:none; cursor:pointer; color:var(--text-light); font-size:0.9em; padding:0; line-height:1;" id="searchClearBtn">✕</button>
+            </div>
         </div>
 
         <!-- Students Table -->
@@ -1451,11 +1639,53 @@
              TAB 5: SETTINGS
         ═══════════════════════════════════════════ -->
         <div class="tab-content" id="tabContent-settings">
-        <div style="max-width:700px; margin:0 auto; display:grid; gap:20px;">
+        <div style="max-width:860px; margin:0 auto;">
 
-            <!-- Center Information -->
-            <div class="panel">
-                <div class="panel-header"><h2>🏫 Center Information</h2></div>
+            <!-- ══ 4 Setting Cards (top row) ══ -->
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px;">
+
+                <!-- Card 1: Center Info -->
+                <div class="sett-card" onclick="toggleSettPanel('sett-center')" id="scard-center">
+                    <div class="sett-card-icon" style="background:linear-gradient(135deg,#1a3a4a,#1e4d5e);">🏫</div>
+                    <div class="sett-card-title">Center Info</div>
+                    <div class="sett-card-sub">Name, Address, Mobile</div>
+                    <div class="sett-card-arrow" id="sarrow-center">▼</div>
+                </div>
+
+                <!-- Card 2: Password -->
+                <div class="sett-card" onclick="toggleSettPanel('sett-password')" id="scard-password">
+                    <div class="sett-card-icon" style="background:linear-gradient(135deg,#2d6a4f,#40916c);">🔒</div>
+                    <div class="sett-card-title">My Password</div>
+                    <div class="sett-card-sub">Change password</div>
+                    <div class="sett-card-arrow" id="sarrow-password">▼</div>
+                </div>
+
+                <!-- Card 3: Course Manager -->
+                <div class="sett-card" onclick="openCourseManager()" id="scard-course">
+                    <div class="sett-card-icon" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">📚</div>
+                    <div class="sett-card-title">Course Manager</div>
+                    <div class="sett-card-sub">Add / Remove courses</div>
+                    <div class="sett-card-arrow">↗</div>
+                </div>
+
+                <!-- Card 4: Data Management -->
+                <div class="sett-card" onclick="toggleSettPanel('sett-data')" id="scard-data">
+                    <div class="sett-card-icon" style="background:linear-gradient(135deg,#b87c1a,#d4a843);">🗄️</div>
+                    <div class="sett-card-title">Data Management</div>
+                    <div class="sett-card-sub">Backup, Export, Reset</div>
+                    <div class="sett-card-arrow" id="sarrow-data">▼</div>
+                </div>
+
+            </div>
+
+            <!-- ══ Expandable Panels ══ -->
+
+            <!-- Center Info Panel -->
+            <div class="sett-panel" id="sett-center">
+                <div class="sett-panel-header">
+                    <span>🏫 Center Information</span>
+                    <button class="sett-panel-close" onclick="toggleSettPanel('sett-center')">✕</button>
+                </div>
                 <div class="info-box">📌 Center ची माहिती update करा — Receipt वर दिसेल</div>
                 <div class="form-group">
                     <label>Center Name</label>
@@ -1472,9 +1702,12 @@
                 <button class="btn btn-primary" onclick="saveCenterInfo()">💾 Save Center Info</button>
             </div>
 
-            <!-- Password Change -->
-            <div class="panel">
-                <div class="panel-header"><h2>🔒 Change My Password</h2></div>
+            <!-- Password Panel -->
+            <div class="sett-panel" id="sett-password">
+                <div class="sett-panel-header">
+                    <span>🔒 Change My Password</span>
+                    <button class="sett-panel-close" onclick="toggleSettPanel('sett-password')">✕</button>
+                </div>
                 <div class="info-box" id="pwdChangeUserInfo">📌 तुम्ही तुमचा स्वतःचा password change करू शकता</div>
                 <div class="form-group">
                     <label>Current Password <span class="required">*</span></label>
@@ -1504,33 +1737,45 @@
                 <button class="btn btn-success" onclick="changePasswordFromSettings()" style="width:100%;">🔑 Update My Password</button>
             </div>
 
-            <!-- Course Manager shortcut -->
-            <div class="panel">
-                <div class="panel-header"><h2>📚 Course Manager</h2></div>
-                <div class="info-box">📌 Courses add / delete करा</div>
-                <button class="btn btn-primary" onclick="openCourseManager()">⚙️ Open Course Manager</button>
-            </div>
-
-            <!-- Data Management — Backup/Restore सर्वांना, Clear फक्त Admin ला -->
-            <div class="panel">
-                <div class="panel-header"><h2>🗄️ Data Management</h2></div>
-                <div style="display:grid; gap:12px;">
-                    <button class="btn" style="background:linear-gradient(135deg,#2d5016,#4a7c22); color:white; border-bottom:3px solid #8bc34a;" onclick="backupData()">💾 Backup Data (JSON)</button>
-                    <button class="btn" style="background:linear-gradient(135deg,#1a3060,#2d4fa8); color:white; border-bottom:3px solid #7b9ef0;" onclick="document.getElementById('restoreFileInput2').click()">📂 Restore Data (JSON)</button>
+            <!-- Data Management Panel -->
+            <div class="sett-panel" id="sett-data">
+                <div class="sett-panel-header">
+                    <span>🗄️ Data Management</span>
+                    <button class="sett-panel-close" onclick="toggleSettPanel('sett-data')">✕</button>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <button class="sett-action-btn" style="--sab-c1:#2d5016;--sab-c2:#4a7c22;--sab-bdr:#8bc34a;" onclick="backupData()">
+                        <span class="sab-icon">💾</span><span>Backup (JSON)</span>
+                    </button>
+                    <button class="sett-action-btn" style="--sab-c1:#1a3060;--sab-c2:#2d4fa8;--sab-bdr:#7b9ef0;" onclick="document.getElementById('restoreFileInput2').click()">
+                        <span class="sab-icon">📂</span><span>Restore (JSON)</span>
+                    </button>
                     <input type="file" id="restoreFileInput2" accept=".json" style="display:none;" onchange="restoreData(event)">
-                    <button class="btn btn-success" onclick="exportToExcel()">📊 Export to Excel</button>
-                    <button class="btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9); color:white; border-bottom:3px solid #a78bfa;" onclick="exportToTally()">📥 Export to Tally (XML)</button>
-                    <button class="btn" style="background:linear-gradient(135deg,#1a3a4a,#1e4d5e); color:white; border-bottom:3px solid #c8732a;" onclick="openGenerateReportModal()">📋 Generate Report</button>
-                    <div class="admin-only-setting" style="display:grid; gap:12px; margin-top:4px;">
-                        <div style="border-top:2px dashed var(--border);"></div>
-                        <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Student Data</button>
-                        <button class="btn" style="background:linear-gradient(135deg,#6b1a1a,#a02020); color:white; border-bottom:3px solid #e05555;" onclick="clearAndResetStorage()">🔄 Clear &amp; Reset All Storage</button>
+                    <button class="sett-action-btn" style="--sab-c1:#2d6a4f;--sab-c2:#40916c;--sab-bdr:#74c69d;" onclick="exportToExcel()">
+                        <span class="sab-icon">📊</span><span>Export Excel</span>
+                    </button>
+                    <button class="sett-action-btn" style="--sab-c1:#7c3aed;--sab-c2:#6d28d9;--sab-bdr:#a78bfa;" onclick="exportToTally()">
+                        <span class="sab-icon">📥</span><span>Tally XML</span>
+                    </button>
+                    <button class="sett-action-btn" style="--sab-c1:#1a3a4a;--sab-c2:#1e4d5e;--sab-bdr:#c8732a; grid-column:1/-1;" onclick="openGenerateReportModal()">
+                        <span class="sab-icon">📋</span><span>Generate PDF Report</span>
+                    </button>
+                </div>
+                <div class="admin-only-setting" style="margin-top:14px;">
+                    <div style="border-top:2px dashed var(--border); margin-bottom:12px;"></div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <button class="sett-action-btn" style="--sab-c1:#8b2a2a;--sab-c2:#b03a3a;--sab-bdr:#e05555;" onclick="clearAllData()">
+                            <span class="sab-icon">🗑️</span><span>Clear Students</span>
+                        </button>
+                        <button class="sett-action-btn" style="--sab-c1:#6b1a1a;--sab-c2:#a02020;--sab-bdr:#ff7070;" onclick="clearAndResetStorage()">
+                            <span class="sab-icon">🔄</span><span>Full Reset</span>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- License / Expiry Info (Admin only) -->
-            <div class="panel admin-only-setting">
+            <!-- License Status (Admin only) -->
+            <div class="panel admin-only-setting" style="margin-top:4px;">
                 <div class="panel-header"><h2>🔑 License Status</h2></div>
                 <div class="expiry-status-bar" style="background:white; border-radius:8px; padding:12px 14px; margin-bottom:10px; border:1px solid var(--border); display:flex; justify-content:space-between;">
                     <span style="color:var(--text-mid);">Expiry Date:</span>
@@ -1723,6 +1968,66 @@
             <button class="btn" style="width:100%; background: linear-gradient(135deg,#1a3a4a 0%,#1e4d5e 100%); color:white; margin-top:5px; border-bottom: 3px solid #c8732a;" onclick="generateReport()">
                 📄 Generate PDF Report
             </button>
+        </div>
+    </div>
+
+    <!-- Edit Student Modal -->
+    <div class="modal" id="editStudentModal" style="display:none;">
+        <div class="modal-content" style="max-width:520px;">
+            <div class="modal-header">
+                <h2 style="font-family:'Playfair Display',serif; font-size:1.2em; color:var(--text-dark);">✏️ Edit Student</h2>
+                <button class="modal-close" onclick="closeEditModal()">×</button>
+            </div>
+
+            <input type="hidden" id="editStudentId">
+
+            <div class="form-group">
+                <label>Receipt Number</label>
+                <input type="number" id="editReceiptNo" class="form-control" style="background:var(--bg-panel-alt); border:1px solid var(--border); border-radius:8px; padding:10px 14px; width:100%; font-family:'DM Sans',sans-serif; font-size:0.95em; color:var(--text-dark);">
+            </div>
+
+            <div class="form-group">
+                <label>Student Name <span class="required">*</span></label>
+                <input type="text" id="editStudentName" class="form-control" style="background:var(--bg-panel-alt); border:1px solid var(--border); border-radius:8px; padding:10px 14px; width:100%; font-family:'DM Sans',sans-serif; font-size:0.95em; color:var(--text-dark);">
+            </div>
+
+            <div class="form-group">
+                <label>Mobile Number <span class="required">*</span></label>
+                <input type="tel" id="editMobile" maxlength="10" class="form-control" style="background:var(--bg-panel-alt); border:1px solid var(--border); border-radius:8px; padding:10px 14px; width:100%; font-family:'DM Sans',sans-serif; font-size:0.95em; color:var(--text-dark);">
+            </div>
+
+            <div class="form-group">
+                <label>Course <span class="required">*</span></label>
+                <select id="editCourse" style="background:var(--bg-panel-alt); border:1px solid var(--border); border-radius:8px; padding:10px 14px; width:100%; font-family:'DM Sans',sans-serif; font-size:0.95em; color:var(--text-dark);">
+                    <option value="">Select Course</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Admission Date</label>
+                <input type="date" id="editAdmissionDate" style="background:var(--bg-panel-alt); border:1px solid var(--border); border-radius:8px; padding:10px 14px; width:100%; font-family:'DM Sans',sans-serif; font-size:0.95em; color:var(--text-dark);">
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div class="form-group">
+                    <label>Total Fees <span class="required">*</span></label>
+                    <input type="number" id="editTotalFees" min="0" oninput="recalcEditBalance()" style="background:var(--bg-panel-alt); border:1px solid var(--border); border-radius:8px; padding:10px 14px; width:100%; font-family:'DM Sans',sans-serif; font-size:0.95em; color:var(--text-dark);">
+                </div>
+                <div class="form-group">
+                    <label>Paid Fees</label>
+                    <input type="number" id="editPaidFees" min="0" oninput="recalcEditBalance()" style="background:var(--bg-panel-alt); border:1px solid var(--border); border-radius:8px; padding:10px 14px; width:100%; font-family:'DM Sans',sans-serif; font-size:0.95em; color:var(--text-dark);">
+                </div>
+            </div>
+
+            <div style="background:linear-gradient(135deg,#1a3a4a,#1e4d5e); border-radius:10px; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                <span style="color:rgba(255,255,255,0.8); font-size:0.9em;">Balance Fees</span>
+                <span id="editBalanceDisplay" style="color:#e8c87a; font-weight:700; font-size:1.15em;">₹0</span>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-primary" style="flex:1;" onclick="saveEditStudent()">✅ Save Changes</button>
+                <button class="btn btn-danger" style="flex:0 0 auto;" onclick="closeEditModal()">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -3124,6 +3429,8 @@ function renderPaymentDonut() {
 
             // Charts update
             renderDashboardCharts();
+            // Filter counts update
+            updateFilterCounts();
         }
 
         function displayStudents(filteredStudents = null) {
@@ -3171,6 +3478,9 @@ function renderPaymentDonut() {
                                 <button class="btn btn-success btn-small" onclick="openPaymentModal(${student.id})">
                                     💰 Pay
                                 </button>` : ''}
+                                <button class="btn btn-small" style="background:linear-gradient(135deg,#b87c1a,#d4a843);color:white;" onclick="openEditModal(${student.id})">
+                                    ✏️
+                                </button>
                                 <button class="btn btn-info btn-small" onclick="viewStudent(${student.id})">
                                     👁️
                                 </button>
@@ -3528,7 +3838,95 @@ ${paymentsText}
             `);
         }
 
-        function deleteStudent(studentId) {
+        // ══════════════════════════════════════════════
+        // EDIT STUDENT
+        // ══════════════════════════════════════════════
+        function openEditModal(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+
+            document.getElementById('editStudentId').value   = studentId;
+            document.getElementById('editReceiptNo').value   = student.receiptNo || '';
+            document.getElementById('editStudentName').value = student.name || '';
+            document.getElementById('editMobile').value      = student.mobile || '';
+            document.getElementById('editTotalFees').value   = student.totalFees || 0;
+            document.getElementById('editPaidFees').value    = student.paidFees  || 0;
+            document.getElementById('editAdmissionDate').value = student.admissionDate
+                ? new Date(student.admissionDate).toISOString().split('T')[0] : '';
+
+            // Course dropdown populate
+            const sel = document.getElementById('editCourse');
+            sel.innerHTML = '<option value="">Select Course</option>';
+            getCourses().forEach(function(c) {
+                const opt = document.createElement('option');
+                opt.value = c; opt.textContent = c;
+                if (c === student.course) opt.selected = true;
+                sel.appendChild(opt);
+            });
+
+            recalcEditBalance();
+
+            const modal = document.getElementById('editStudentModal');
+            modal.style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editStudentModal').style.display = 'none';
+        }
+
+        function recalcEditBalance() {
+            const total = parseFloat(document.getElementById('editTotalFees').value) || 0;
+            const paid  = parseFloat(document.getElementById('editPaidFees').value)  || 0;
+            const bal   = Math.max(0, total - paid);
+            document.getElementById('editBalanceDisplay').textContent = '₹' + bal.toLocaleString('en-IN');
+        }
+
+        function saveEditStudent() {
+            const id      = parseInt(document.getElementById('editStudentId').value);
+            const name    = document.getElementById('editStudentName').value.trim();
+            const mobile  = document.getElementById('editMobile').value.trim();
+            const course  = document.getElementById('editCourse').value;
+            const receipt = parseInt(document.getElementById('editReceiptNo').value) || 0;
+            const total   = parseFloat(document.getElementById('editTotalFees').value) || 0;
+            const paid    = parseFloat(document.getElementById('editPaidFees').value)  || 0;
+            const admDate = document.getElementById('editAdmissionDate').value;
+
+            if (!name)   { alert('⚠️ Student Name टाका!'); return; }
+            if (!mobile || mobile.length !== 10) { alert('⚠️ Valid 10-digit Mobile Number टाका!'); return; }
+            if (!course) { alert('⚠️ Course निवडा!'); return; }
+            if (total <= 0) { alert('⚠️ Total Fees टाका!'); return; }
+            if (paid > total) { alert('⚠️ Paid Fees, Total Fees पेक्षा जास्त असू शकत नाही!'); return; }
+
+            // Duplicate receipt check (except self)
+            const dupReceipt = students.find(s => s.receiptNo === receipt && s.id !== id);
+            if (dupReceipt) { alert('⚠️ हा Receipt Number आधीच आहे!'); return; }
+
+            const idx = students.findIndex(s => s.id === id);
+            if (idx === -1) { alert('⚠️ Student सापडला नाही!'); return; }
+
+            students[idx].receiptNo     = receipt;
+            students[idx].name          = name;
+            students[idx].mobile        = mobile;
+            students[idx].course        = course;
+            students[idx].totalFees     = total;
+            students[idx].paidFees      = paid;
+            students[idx].balance       = Math.max(0, total - paid);
+            if (admDate) students[idx].admissionDate = admDate;
+
+            localStorage.setItem('icsStudents', JSON.stringify(students));
+
+            closeEditModal();
+            updateStatistics();
+            displayStudents();
+            alert('✅ Student माहिती update झाली!');
+        }
+
+        // Close modal on outside click
+        document.getElementById('editStudentModal').addEventListener('click', function(e) {
+            if (e.target === this) closeEditModal();
+        });
+
+                function deleteStudent(studentId) {
             if (!confirm('⚠️ Are you sure you want to delete this student?')) return;
 
             students = students.filter(s => s.id !== studentId);
@@ -3540,25 +3938,81 @@ ${paymentsText}
         }
 
         function searchStudents() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-            
-            if (!searchTerm) {
-                displayStudents();
-                return;
-            }
-
-            const filtered = students.filter(s => 
-                s.name.toLowerCase().includes(searchTerm) ||
-                s.mobile.includes(searchTerm) ||
-                s.course.toLowerCase().includes(searchTerm)
-            );
-
-            displayStudents(filtered);
+            applyFilterAndSearch();
         }
 
         function showAllStudents() {
             document.getElementById('searchInput').value = '';
-            displayStudents();
+            filterByStatus('all');
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            applyFilterAndSearch();
+        }
+
+        // ── Status Filter ──
+        let _activeStatusFilter = 'all';
+
+        function filterByStatus(status) {
+            _activeStatusFilter = status;
+
+            // Active button highlight
+            ['all','paid','partial','pending'].forEach(function(s) {
+                var btn = document.getElementById('filterBtn-' + s);
+                if (btn) btn.classList.toggle('active-filter', s === status);
+            });
+
+            applyFilterAndSearch();
+        }
+
+        // ── Filter + Search एकत्र ──
+        function applyFilterAndSearch() {
+            var term = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+
+            // Step 1: Status filter
+            var byStatus;
+            if (_activeStatusFilter === 'all') {
+                byStatus = students;
+            } else if (_activeStatusFilter === 'paid') {
+                byStatus = students.filter(function(s) { return s.balance === 0 && s.totalFees > 0; });
+            } else if (_activeStatusFilter === 'partial') {
+                byStatus = students.filter(function(s) { return s.paidFees > 0 && s.balance > 0; });
+            } else if (_activeStatusFilter === 'pending') {
+                byStatus = students.filter(function(s) { return s.paidFees === 0; });
+            } else {
+                byStatus = students;
+            }
+
+            // Step 2: Search within filtered
+            var result;
+            if (!term) {
+                result = _activeStatusFilter === 'all' ? null : byStatus;
+            } else {
+                result = byStatus.filter(function(s) {
+                    return (s.name   || '').toLowerCase().includes(term) ||
+                           (s.mobile || '').includes(term) ||
+                           (s.course || '').toLowerCase().includes(term);
+                });
+            }
+
+            displayStudents(result);
+        }
+
+        function updateFilterCounts() {
+            var paid    = students.filter(function(s) { return s.balance === 0 && s.totalFees > 0; }).length;
+            var partial = students.filter(function(s) { return s.paidFees > 0 && s.balance > 0; }).length;
+            var pending = students.filter(function(s) { return s.paidFees === 0; }).length;
+
+            var allEl     = document.getElementById('filterCount-all');
+            var paidEl    = document.getElementById('filterCount-paid');
+            var partialEl = document.getElementById('filterCount-partial');
+            var pendingEl = document.getElementById('filterCount-pending');
+
+            if (allEl)     allEl.textContent     = students.length;
+            if (paidEl)    paidEl.textContent     = paid;
+            if (partialEl) partialEl.textContent  = partial;
+            if (pendingEl) pendingEl.textContent  = pending;
         }
 
         function showPendingPayments() {
@@ -3966,7 +4420,7 @@ ${paymentsText}
 
             // ── Table ──
             const cols   = ['#', 'Receipt', 'Student Name', 'Course', 'Total', 'Paid', 'Balance', 'Status'];
-            const colWs  = [8, 16, 42, 26, 22, 22, 22, 18];
+            const colWs  = [7, 14, 55, 28, 22, 22, 20, 16];
             const tableW = colWs.reduce((a, b) => a + b, 0);
             const tableX = (W - tableW) / 2;
             const rowH   = 7;
@@ -3979,7 +4433,11 @@ ${paymentsText}
             doc.setFont(undefined, 'bold');
             doc.setFontSize(7);
             cols.forEach((col, i) => {
-                doc.text(col, cx + colWs[i] / 2, y + 4.8, { align: 'center' });
+                if (i === 2 || i === 3) {
+                    doc.text(col, cx + 2, y + 4.8, { align: 'left' });
+                } else {
+                    doc.text(col, cx + colWs[i] / 2, y + 4.8, { align: 'center' });
+                }
                 cx += colWs[i];
             });
             y += rowH;
@@ -4006,7 +4464,11 @@ ${paymentsText}
                     doc.setFont(undefined, 'bold');
                     doc.setFontSize(7);
                     cols.forEach((col, i) => {
-                        doc.text(col, cx + colWs[i] / 2, y + 4.8, { align: 'center' });
+                        if (i === 2 || i === 3) {
+                            doc.text(col, cx + 2, y + 4.8, { align: 'left' });
+                        } else {
+                            doc.text(col, cx + colWs[i] / 2, y + 4.8, { align: 'center' });
+                        }
                         cx += colWs[i];
                     });
                     y += rowH;
@@ -4022,8 +4484,8 @@ ${paymentsText}
                 const cells = [
                     String(idx + 1),
                     String(s.receiptNo),
-                    s.name.length > 20 ? s.name.substring(0,19) + '.' : s.name,
-                    s.course.length > 14 ? s.course.substring(0,13) + '.' : s.course,
+                    s.name,
+                    s.course.length > 18 ? s.course.substring(0,17) + '.' : s.course,
                     'Rs.' + s.totalFees.toLocaleString('en-IN'),
                     'Rs.' + s.paidFees.toLocaleString('en-IN'),
                     'Rs.' + s.balance.toLocaleString('en-IN'),
@@ -4041,7 +4503,14 @@ ${paymentsText}
                         doc.setTextColor(50, 50, 50);
                         doc.setFont(undefined, 'normal');
                     }
-                    doc.text(cell, cx + colWs[i] / 2, y + 4.8, { align: 'center' });
+                    // Name column (i=2) आणि Course (i=3) — left align, बाकी center
+                    if (i === 2) {
+                        doc.text(cell, cx + 2, y + 4.8, { align: 'left' });
+                    } else if (i === 3) {
+                        doc.text(cell, cx + 2, y + 4.8, { align: 'left' });
+                    } else {
+                        doc.text(cell, cx + colWs[i] / 2, y + 4.8, { align: 'center' });
+                    }
                     cx += colWs[i];
                 });
 
@@ -4833,6 +5302,7 @@ function switchTab(tabId) {
         updateStatistics();
         displayStudents();
         setNextReceiptNumber();
+        updateFilterCounts();
     }
     if (tabId === 'enquiry') renderEnquiries();
     if (tabId === 'expenses') renderExpenses();
@@ -5769,6 +6239,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// ── Settings Panel Toggle ──
+function toggleSettPanel(panelId) {
+    var panels = ['sett-center','sett-password','sett-data'];
+    var cards  = { 'sett-center':'scard-center', 'sett-password':'scard-password', 'sett-data':'scard-data' };
+
+    panels.forEach(function(pid) {
+        var panel = document.getElementById(pid);
+        var card  = document.getElementById(cards[pid]);
+        var arrow = document.getElementById('sarrow-' + pid.replace('sett-',''));
+
+        if (pid === panelId) {
+            var isOpen = panel && panel.classList.contains('open');
+            if (panel) panel.classList.toggle('open', !isOpen);
+            if (card)  card.classList.toggle('active-scard', !isOpen);
+        } else {
+            if (panel) panel.classList.remove('open');
+            if (card)  card.classList.remove('active-scard');
+        }
+    });
+}
 
 function saveCenterInfo() {
     var name    = document.getElementById('settCenterName').value.trim();
